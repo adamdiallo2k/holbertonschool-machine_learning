@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 def compute_shape_3d(nested_list):
     if not isinstance(nested_list, list) or not nested_list:
         return []
