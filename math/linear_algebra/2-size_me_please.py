@@ -2,8 +2,8 @@
 """commented module"""
 
 
-
 def matrix_shape(matrix):
+    """matrix shape using recursivity"""
     def get_shape_recursive(current_element):
         if not isinstance(current_element, list):
             return []
