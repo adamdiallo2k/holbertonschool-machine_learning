@@ -5,7 +5,7 @@
 def np_transpose(matrix):
     """
     Transpose a given matrix represented as a list of lists.
-    
+
     :param matrix: A matrix to be transposed
     :return: Transposed matrix
     """
