@@ -4,12 +4,13 @@
 
 def np_elementwise(mat1, mat2):
     """
-    Perform element-wise operations on two numpy arrays: addition, subtraction, 
+    Perform element-wise operations on two numpy arrays: addition, subtraction,
     multiplication, and division.
 
     :param mat1: First numpy array
     :param mat2: Second numpy array
-    :return: A tuple containing the element-wise sum, difference, product, and quotient
+    :return: A tuple containing the element-wise sum, difference
+    , product, and quotient
     """
     sum_array = mat1 + mat2  # Element-wise addition
     diff_array = mat1 - mat2  # Element-wise subtraction
