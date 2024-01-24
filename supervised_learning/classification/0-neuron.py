@@ -4,6 +4,7 @@ import numpy as np
 
 
 class Neuron:
+    """commented class"""
     def __init__(self, nx):
         """
         Constructor for the Neuron class.
