@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""commented module """
 import numpy as np
-
 
 class Neuron:
     """ Represents a single neuron performing binary classification. """
@@ -12,13 +10,17 @@ class Neuron:
 
         Parameters:
         nx (int): Number of input features for the neuron.
+        
+        Raises:
+        TypeError: If nx is not an integer.
+        ValueError: If nx is less than 1.
         """
         if not isinstance(nx, int):
             raise TypeError("nx must be an integer")
         if nx < 1:
             raise ValueError("nx must be a positive integer")
 
-        self.__W = [0] * nx  # Weights, initialized to zeroes
+        self.__W = np.random.randn(1, nx)  # Weights, initialized randomly
         self.__b = 0  # Bias, initialized to 0
         self.__A = 0  # Activated output, initialized to 0
 
@@ -42,51 +44,26 @@ class Neuron:
         Calculates the forward propagation of the neuron.
 
         Parameters:
-        X (list of lists): List of lists with shape (nx, m) containing the input data.
+        X (numpy.ndarray): numpy.ndarray with shape (nx, m) containing the input data.
+        
+        Returns:
+        numpy.ndarray: The activated output of the neuron.
         """
-        m = len(X[0])
-        Z = [self.__b] * m
-        for i in range(len(self.__W)):
-            for j in range(m):
-                Z[j] += self.__W[i] * X[i][j]
-
-        self.__A = [1 / (1 + self.exp(-z)) for z in Z]
+        Z = np.dot(self.__W, X) + self.__b
+        self.__A = 1 / (1 + np.exp(-Z))
         return self.__A
-
-    def exp(self, x):
-        """
-        Calculates the exponential of x.
-        """
-        n = 10  # Precision of the approximation
-        return sum([x**i / self.factorial(i) for i in range(n)])
-
-    def factorial(self, n):
-        """
-        Calculates the factorial of n.
-        """
-        return 1 if n == 0 else n * self.factorial(n - 1)
-
-    def log(self, x):
-        """
-        Calculates the natural logarithm of x.
-        """
-        n = 100  # Precision of the approximation
-        if x - 1 < 0:
-            return -sum([((1 - x) ** i) / i for i in range(1, n)])
-        else:
-            return sum([((x - 1) ** i) / i for i in range(1, n)])
 
     def cost(self, Y, A):
         """
         Calculates the cost of the model using logistic regression.
 
         Parameters:
-        Y (list): List containing the correct labels.
-        A (list): List containing the activated output.
+        Y (numpy.ndarray): numpy.ndarray with shape (1, m) containing the correct labels.
+        A (numpy.ndarray): numpy.ndarray with shape (1, m) containing the activated output.
 
         Returns:
-        The cost.
+        numpy.ndarray: The cost of the model.
         """
-        m = len(Y)
-        cost = - sum([Y[i] * self.log(A[i]) + (1 - Y[i]) * self.log(1.0000001 - A[i]) for i in range(m)]) / m
+        m = Y.shape[1]
+        cost = -(1 / m) * np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A))
         return cost
