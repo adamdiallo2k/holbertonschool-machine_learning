@@ -50,7 +50,7 @@ class Neuron:
          (nx, m) containing the input data.
 
         Returns:
-        numpy.ndarray: The activated 
+        numpy.ndarray: The activated
         output of the neuron.
         """
         Z = np.dot(self.__W, X) + self.__b
@@ -59,11 +59,11 @@ class Neuron:
 
     def cost(self, Y, A):
         """
-        Calculates the cost of the model 
+        Calculates the cost of the model
         using logistic regression.
 
         Parameters:
-        Y (numpy.ndarray): numpy.ndarray with shape 
+        Y (numpy.ndarray): numpy.ndarray with shape
         (1, m) containing the correct labels.
         A (numpy.ndarray): numpy.ndarray
          with shape (1, m) containing the activated output.
@@ -73,5 +73,6 @@ class Neuron:
         The cost of the model.
         """
         m = Y.shape[1]
-        cost = -(1 / m) * np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A))
+        cost = -(1 / m) * np.sum(Y * np.log(A) 
+        + (1 - Y) * np.log(1.0000001 - A))
         return cost
