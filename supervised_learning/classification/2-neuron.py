@@ -10,7 +10,7 @@ class Neuron:
 
         Parameters:
         nx (int): Number of input features for the neuron.
-        
+
         Raises:
         TypeError: If nx is not an integer.
         ValueError: If nx is less than 1.
@@ -45,7 +45,7 @@ class Neuron:
 
         Parameters:
         X (numpy.ndarray): numpy.ndarray with shape (nx, m) containing the input data.
-        
+
         Returns:
         numpy.ndarray: The activated output of the neuron.
         """
