@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
 
+
 class Neuron:
     """ Represents a single neuron performing binary classification. """
 
@@ -41,13 +42,16 @@ class Neuron:
 
     def forward_prop(self, X):
         """
-        Calculates the forward propagation of the neuron.
+        Calculates the forward
+         propagation of the neuron.
 
         Parameters:
-        X (numpy.ndarray): numpy.ndarray with shape (nx, m) containing the input data.
+        X (numpy.ndarray): numpy.ndarray with shape
+         (nx, m) containing the input data.
 
         Returns:
-        numpy.ndarray: The activated output of the neuron.
+        numpy.ndarray: The activated 
+        output of the neuron.
         """
         Z = np.dot(self.__W, X) + self.__b
         self.__A = 1 / (1 + np.exp(-Z))
@@ -55,14 +59,18 @@ class Neuron:
 
     def cost(self, Y, A):
         """
-        Calculates the cost of the model using logistic regression.
+        Calculates the cost of the model 
+        using logistic regression.
 
         Parameters:
-        Y (numpy.ndarray): numpy.ndarray with shape (1, m) containing the correct labels.
-        A (numpy.ndarray): numpy.ndarray with shape (1, m) containing the activated output.
+        Y (numpy.ndarray): numpy.ndarray with shape 
+        (1, m) containing the correct labels.
+        A (numpy.ndarray): numpy.ndarray
+         with shape (1, m) containing the activated output.
 
         Returns:
-        numpy.ndarray: The cost of the model.
+        numpy.ndarray: 
+        The cost of the model.
         """
         m = Y.shape[1]
         cost = -(1 / m) * np.sum(Y * np.log(A) + (1 - Y) * np.log(1.0000001 - A))
