@@ -36,3 +36,6 @@ class Neuron:
     def A(self):
         """ Getter pour A. """
         return self.__A
+    
+    def forward_prop(self, X):
+        
