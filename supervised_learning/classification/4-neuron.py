@@ -90,3 +90,24 @@ class Neuron:
                                       np.log(1.0000001 - A)))
 
         return log_loss
+
+    def evaluate(self, X, Y):
+        """
+        Method to evaluate the neuron's prediction
+
+        :param X: ndarray shape(nx,m) contains input data
+        :param Y: ndarray shape (1,m) correct labels
+
+        :return: neuron's prediction and cost of the network
+        """
+
+        # run forward propagation
+        A = self.forward_prop(X)
+
+        # calculate cost
+        cost = self.cost(Y, A)
+
+        # label values
+        result = np.where(A >= 0.5, 1, 0)
+
+        return result, cost
