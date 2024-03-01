@@ -22,7 +22,7 @@ def create_layer(prev, n, activation):
     # Define the He et al. initializer for the layer weights
     initializer = tf.keras.initializers.VarianceScaling(mode='fan_avg')
 
-    
+
     layer = tf.layers.Dense(units=n, activation=activation,
                             kernel_initializer=initializer,
                             name="layer")
