@@ -22,11 +22,9 @@ def forward_prop(x, layer_sizes=[], activations=[]):
         activation = None
         if i < len(activations):
             activation = activations[i]
-
-        # Splitting the function call across multiple lines to address line length
         a = create_layer(
-            prev=a, 
-            n=size, 
+            prev=a,
+            n=size,
             activation=activation
         )
 
