@@ -5,19 +5,21 @@
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
-
-def model_input(nx, classes):
+def create_placeholders(nx, classes):
     """
-    Defines input and output layers for a model in TensorFlow 2.x.
-
-    Parameters:
-    nx (int): The number of feature columns in our data.
-    classes (int): The number of classes in our classifier.
-
+    Creates and returns two placeholders, x and y, for a neural network.
+    
+    Arguments:
+    nx -- scalar, size of an image vector (num_px * num_px = nx)
+    classes -- scalar, number of classes (from 0 to classes-1)
+    
     Returns:
-    A TensorFlow Keras model with the specified input and output layer shapes.
+    x -- placeholder for the data input, of shape [None, nx] and dtype "float"
+    y -- placeholder for the input labels, of shape [None, classes] and dtype "float"
     """
-    inputs = tf.keras.Input(shape=(nx,))
-    outputs = tf.keras.layers.Dense(classes, activation='softmax')(inputs)
-    model = tf.keras.Model(inputs=inputs, outputs=outputs)
-    return model
+    
+    x = tf.placeholder(tf.float32, shape=[None, nx], name="x")
+    y = tf.placeholder(tf.float32, shape=[None, classes], name="y")
+    
+    return x, y
+
