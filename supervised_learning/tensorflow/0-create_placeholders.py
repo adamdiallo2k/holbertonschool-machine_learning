@@ -15,8 +15,10 @@ def create_placeholders(nx, classes):
     classes -- scalar, number of classes (from 0 to classes-1)
 
     Returns:
-    x -- placeholder for the data input, of shape [None, nx] and dtype "float"
-    y -- placeholder for the input labels, of shape [None, classes] and dtype "float"
+    x -- placeholder for the data input, of shape 
+    [None, nx] and dtype "float"
+    y -- placeholder for the input labels, of shape [None, classes] 
+    and dtype "float"
     """
 
     x = tf.placeholder(tf.float32, shape=[None, nx], name="x")
