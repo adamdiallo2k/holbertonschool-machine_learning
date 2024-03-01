@@ -5,6 +5,7 @@
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
 
+
 def calculate_accuracy(y, y_pred):
     """
     Calculates the accuracy of a prediction.
