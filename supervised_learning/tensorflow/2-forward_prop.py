@@ -9,6 +9,7 @@ tf.disable_v2_behavior()
 # Import the create_layer function
 create_layer = __import__('1-create_layer').create_layer
 
+
 def forward_prop(x, layer_sizes=[], activations=[]):
     """
     Creates the forward propagation graph for the neural network.
@@ -21,7 +22,7 @@ def forward_prop(x, layer_sizes=[], activations=[]):
         activation = None
         if i < len(activations):
             activation = activations[i]
-        
+
         # Splitting the function call across multiple lines to address line length
         a = create_layer(
             prev=a, 
