@@ -12,26 +12,21 @@ create_layer = __import__('1-create_layer').create_layer
 def forward_prop(x, layer_sizes=[], activations=[]):
     """
     Creates the forward propagation graph for the neural network.
-
-    Arguments:
-    x -- the placeholder for the input data.
-    layer_sizes -- list containing the number of nodes in each layer of the network.
-    activations -- list containing the activation functions for each layer of the network.
-
-    Returns:
-    The prediction of the network in tensor form.
     """
 
-    # Initialize the input for the first layer
-    a = x
+    a = x  # Correctly spaced comment and code
 
-    # Iterate through each layer to create the network
+    # Adjusting the loop to avoid long lines
     for i, size in enumerate(layer_sizes):
+        activation = None
+        if i < len(activations):
+            activation = activations[i]
         
-        activation = activations[i] if i < len(activations) else None
+        # Splitting the function call across multiple lines to address line length
+        a = create_layer(
+            prev=a, 
+            n=size, 
+            activation=activation
+        )
 
-        # Create the layer and update 'a' to be the output of the current layer
-        a = create_layer(a, size, activation)
-
-    # 'a' now holds the output of the last layer, which is the network's prediction
     return a
