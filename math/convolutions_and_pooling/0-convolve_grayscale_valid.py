@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+"""
+    Valid Convolution
+"""
+
 import numpy as np
 
 
