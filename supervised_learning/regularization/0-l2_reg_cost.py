@@ -19,9 +19,9 @@ def l2_reg_cost(cost, lambtha, weights, L, m):
     Returns :
     Coût total avec régularisation L2.
     """
-    
-    l2_penalty = sum([np.sum(np.square(weights['W' + str(l)]))
-                      for l in range(1, L + 1)])
-    
+
+    l2_penalty = sum([np.sum(np.square(weights['W' + str(layer)]))
+                      for layer in range(1, L + 1)])
+
     cost_l2 = cost + (lambtha / (2 * m)) * l2_penalty
     return cost_l2
