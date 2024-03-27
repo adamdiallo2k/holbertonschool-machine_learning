@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+"""commented module """
+
 import numpy as np
 
 def convolve_grayscale_valid(images, kernel):
