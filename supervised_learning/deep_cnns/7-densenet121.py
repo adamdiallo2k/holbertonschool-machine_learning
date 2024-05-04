@@ -62,4 +62,3 @@ def densenet121(growth_rate=32, compression=1.0):
     model = K.models.Model(input_data, full_connected)
 
     return model
-    
