@@ -235,7 +235,7 @@ class NST:
             )
 
         # uniform initialization
-        weight = 1.0 / float(len_style_layer)
+        weight = 1.0 / len_style_layer
 
         cost_total = sum([weight * self.layer_style_cost(style, target)
                           for style, target
@@ -278,7 +278,7 @@ class NST:
         """
         shape_content_image = self.content_image.shape
 
-        if (not isinstance(generated_image, (tf.Tensor, tf.Variable))
+        if (not isinstance(generated_image, tf.Tensor)
                 or generated_image.shape != shape_content_image):
             raise TypeError("generated_image must be a tensor of shape {}"
                             .format(shape_content_image))
@@ -300,33 +300,3 @@ class NST:
         J = self.alpha * J_content + self.beta * J_style
 
         return J, J_content, J_style
-
-    def compute_grads(self, generated_image):
-        """
-            method to calculate gradients for tf.tensor generated image
-            shape(1,nh,nw,3)
-
-        :param generated_image: tf.Tensor or tf.Variable
-                    same shape as self.content_image
-        :return: gradients, J_total, J, content, J_style
-        """
-        # define shape
-        shape_content_image = \
-            (1, self.content_image.shape[1], self.content_image.shape[2], 3)
-
-        if (not isinstance(generated_image, (tf.Tensor, tf.Variable))
-                or generated_image.shape != shape_content_image):
-            raise TypeError("generated_image must be a tensor of shape {}"
-                            .format(shape_content_image))
-
-        # create GradientTape context to track operations for automatic
-        # differentiation.
-        with tf.GradientTape() as tape:
-            tape.watch(generated_image)
-            J_total, J_content, J_style = self.total_cost(generated_image)
-
-        # calculate gradients of the total cost with respect to generated image
-        # using gradient method of tape
-        grad = tape.gradient(J_total, generated_image)
-
-        return grad, J_total, J_content, J_style
