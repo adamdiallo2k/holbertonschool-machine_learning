@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 import numpy as np
 
+
 class GaussianProcess:
-    """Represents a noiseless 1D Gaussian process"""
+    """Represents a noiseless 1D Gaussian process."""
     
     def __init__(self, X_init, Y_init, l=1, sigma_f=1):
         """
@@ -23,7 +24,7 @@ class GaussianProcess:
     
     def kernel(self, X1, X2):
         """
-        Calculates the covariance kernel matrix between two matrices using the RBF kernel
+        Calculates the covariance kernel matrix between two matrices using the RBF kernel.
         
         Args:
             X1: numpy.ndarray of shape (m, 1)
