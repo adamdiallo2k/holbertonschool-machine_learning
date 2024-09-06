@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""commented module """
 import numpy as np
 
 def pca(X, var=0.95):
@@ -49,3 +48,4 @@ def pca(X, var=0.95):
     
     # Return the projected data and the weight matrix
     return X_pca, W
+
