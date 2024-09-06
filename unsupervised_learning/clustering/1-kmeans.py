@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-    Clustering using K-means algorithm
+    Clustering
 """
 
 import numpy as np
@@ -8,20 +8,20 @@ import numpy as np
 
 def kmeans(X, k, iterations=1000):
     """
-        Performs K-means clustering on a dataset.
+        performs K-means on a dataset
 
-    :param X: ndarray of shape (n, d) containing the dataset
+    :param X: ndarray, shape(n,d) dataset
         n: number of data points
         d: number of dimensions for each data point
     :param k: int, number of clusters
-    :param iterations: positive int, maximum number of iterations
+    :param iterations: positiv int, maximum number of iterations
 
     :return: C, clss or None, None on failure
-        C: ndarray of shape (k, d) containing the centroid means for each cluster
-        clss: ndarray of shape (n,) containing the index of the cluster in C
-              that each data point belongs to
+            C: ndarray, shape(k,d) centroid means for each cluster
+            clss: ndarray, shape(n,) index of cluster in c that
+                each data point belongs to
     """
-    # Validate inputs
+
     if not isinstance(k, int) or k <= 0:
         return None, None
 
@@ -33,31 +33,38 @@ def kmeans(X, k, iterations=1000):
 
     n, d = X.shape
 
-    # Initialize centroids with multivariate uniform distribution
     low = np.min(X, axis=0)
     high = np.max(X, axis=0)
+
+    # first define centroid with multivariate uniform distribution
     centroids = np.random.uniform(low=low, high=high, size=(k, d))
     new_centroids = np.empty((k, d), dtype=X.dtype)
 
-    # Main loop for K-means
+    # K-means algo
     for i in range(iterations):
-        # Step 1: Compute distances between data points and centroids
-        distances = np.linalg.norm(X[:, np.newaxis] - centroids, axis=2)
-        clss = np.argmin(distances, axis=1)
+        # distances between datapoints and centroids
+        distances = np.sqrt(np.sum((X - centroids[:, np.newaxis]) ** 2,
+                            axis=-1))
+        clss = np.argmin(distances, axis=0)
 
-        # Step 2: Update centroids
+        # Update centroids
         for j in range(k):
             mask = (clss == j)
             if np.any(mask):
-                new_centroids[j] = np.mean(X[mask], axis=0)
+                new_centroids[j] = X[mask].mean(axis=0)
             else:
-                # Reinitialize centroid if no points are assigned to it
-                new_centroids[j] = np.random.uniform(low=low, high=high, size=(1, d))
+                new_centroids[j] = (
+                    np.random.uniform(low=low, high=high, size=(1, d)))
 
-        # Step 3: Check for convergence
+        # Check convergence
         if np.allclose(centroids, new_centroids):
             break
 
         centroids = new_centroids.copy()
+
+        # calculate clss again with final centroids
+        distances = np.sqrt(np.sum((X - centroids[:, np.newaxis]) ** 2,
+                            axis=-1))
+        clss = np.argmin(distances, axis=0)
 
     return centroids, clss
