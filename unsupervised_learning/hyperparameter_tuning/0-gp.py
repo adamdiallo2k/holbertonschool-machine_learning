@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
+"""commented module"""
 
 
 import numpy as np
-"""commented module"""
 
 
 class GaussianProcess:
