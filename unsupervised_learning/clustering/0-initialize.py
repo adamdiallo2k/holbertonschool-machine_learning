@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-"""Initializes cluster centroids for K-means."""
-
 import numpy as np
 
 def initialize(X, k):
@@ -14,6 +12,7 @@ def initialize(X, k):
     Returns:
         numpy.ndarray: Initialized centroids, or None on failure
     """
+    # Check for valid inputs
     if not isinstance(X, np.ndarray) or not isinstance(k, int):
         return None
     if k <= 0 or len(X.shape) != 2:
