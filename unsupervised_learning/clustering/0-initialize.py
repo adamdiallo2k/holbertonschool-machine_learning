@@ -4,12 +4,12 @@ import numpy as np
 def initialize(X, k):
     """
     Initializes centroids for K-means using a uniform distribution.
-    
+
     Args:
     - X (numpy.ndarray): Dataset (n, d), where n is the number of points and 
       d is the number of dimensions.
     - k (int): Number of clusters.
-    
+
     Returns:
     - numpy.ndarray: Initialized centroids of shape (k, d), or None on failure.
     """
