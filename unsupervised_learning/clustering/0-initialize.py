@@ -29,5 +29,4 @@ def initialize(X, k):
         low=min_values, high=max_values, size=(k, X.shape[1])
     )
 
-
     return centroids
