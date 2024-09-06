@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import numpy as np
-
+"""commented module"""
 
 class GaussianProcess:
     """Represents a noiseless 1D Gaussian process."""
