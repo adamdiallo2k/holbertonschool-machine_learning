@@ -16,6 +16,15 @@ def initialize(X, k):
 def kmeans(X, k, iterations=1000):
     """
     Performs K-means clustering on a dataset.
+    
+    Args:
+    - X (numpy.ndarray): Dataset of shape (n, d).
+    - k (int): Number of clusters.
+    - iterations (int): Maximum number of iterations.
+
+    Returns:
+    - C (numpy.ndarray): Centroid means for each cluster.
+    - clss (numpy.ndarray): Index of the cluster each data point belongs to.
     """
     if not isinstance(X, np.ndarray) or len(X.shape) != 2 or \
        not isinstance(k, int) or k <= 0 or not isinstance(iterations, int) or iterations <= 0:
@@ -29,23 +38,23 @@ def kmeans(X, k, iterations=1000):
     clss = np.zeros(n)
     prev_C = np.copy(C)
 
-    for i in range(iterations):  # First loop: iterate over the allowed number of iterations
-        # Step 1: Assign points to nearest centroid (vectorized, no loop here)
+    for _ in range(iterations):  # First loop (iteration loop)
+        # Step 1: Assign points to nearest centroid (vectorized)
         distances = np.linalg.norm(X[:, np.newaxis] - C, axis=2)
         clss = np.argmin(distances, axis=1)
 
-        # Step 2: Update centroids (second loop: iterate over each centroid)
-        for j in range(k):
+        # Step 2: Update centroids (Second loop: iterate over each centroid)
+        new_C = np.zeros_like(C)
+        for j in range(k):  # Second loop (centroid update loop)
             if np.any(clss == j):
-                C[j] = np.mean(X[clss == j], axis=0)
+                new_C[j] = np.mean(X[clss == j], axis=0)
             else:
                 # Reinitialize the centroid if it has no points
-                C[j] = np.random.uniform(low=np.min(X, axis=0), high=np.max(X, axis=0))
+                new_C[j] = np.random.uniform(low=np.min(X, axis=0), high=np.max(X, axis=0))
 
-        # Check for convergence (if centroids don't change)
-        if np.all(C == prev_C):
+        # Check for convergence
+        if np.all(new_C == C):
             break
-
-        prev_C = np.copy(C)
+        C = new_C
 
     return C, clss
