@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import numpy as np
+"commented module"
+
 
 def initialize(X, k):
-
-
     """
     Initializes centroids for K-means using a uniform distribution.
 
