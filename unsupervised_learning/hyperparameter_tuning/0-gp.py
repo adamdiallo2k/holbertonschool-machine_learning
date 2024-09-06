@@ -17,10 +17,8 @@ class GaussianProcess:
         self.K = self.kernel(X_init, X_init)
 
     def kernel(self, X1, X2):
-        """
-Calculates the covariance kernel matrix
-        """
-    # Squared distance between points
-        sqdist = np.sum(X1**2, axis=1).reshape(-1, 1) + np.sum(X2**2, axis=1) - 2 * X1 @ X2.T
-     # RBF kernel formula
+        """Covariance kernel matrix with RBF."""
+        sqdist = np.sum(X1**2, axis=1).reshape(-1, 1) + np.sum(X2**2, axis=1)
+        sqdist -= 2 * X1 @ X2.T
         return self.sigma_f**2 * np.exp(-0.5 * sqdist / self.l**2)
+
