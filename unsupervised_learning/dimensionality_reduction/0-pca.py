@@ -1,51 +1,41 @@
 #!/usr/bin/env python3
+"""
+    Perform Principal Component Analysis (PCA) on a dataset.
+"""
 import numpy as np
 
 def pca(X, var=0.95):
     """
-    Performs Principal Component Analysis (PCA) on the dataset X.
-    
+    Perform PCA on the dataset X.
+
     Args:
     X : numpy.ndarray of shape (n, d)
-        The dataset where n is the number of data points and d is the number of dimensions.
-    var : float
-        The fraction of the variance that the PCA transformation should maintain.
-    
-    Returns:
-    X_pca : numpy.ndarray of shape (n, nd)
-        The dataset X transformed to the new lower-dimensional space.
-    W : numpy.ndarray of shape (d, nd)
-        The weights matrix that maintains var fraction of X's original variance.
-        nd is the new dimensionality of the transformed X.
-    """
-    # Step 1: Standardize the data by subtracting the mean and dividing by the standard deviation
-    X_mean = np.mean(X, axis=0)
-    X_std = np.std(X, axis=0)
-    X_centered = (X - X_mean) / X_std
-    
-    # Step 2: Compute the covariance matrix of the standardized dataset
-    cov_matrix = np.cov(X_centered, rowvar=False)
-    
-    # Step 3: Perform Eigen Decomposition on the covariance matrix using eigh (for symmetric matrices)
-    eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
-    
-    # Step 4: Sort the eigenvalues and eigenvectors in descending order
-    sorted_indices = np.argsort(eigenvalues)[::-1]
-    sorted_eigenvalues = eigenvalues[sorted_indices]
-    sorted_eigenvectors = eigenvectors[:, sorted_indices]
-    
-    # Step 5: Calculate the cumulative variance explained by each principal component
-    cumulative_variance = np.cumsum(sorted_eigenvalues) / np.sum(sorted_eigenvalues)
-    
-    # Step 6: Determine the number of components that maintain the desired variance
-    nd = np.argmax(cumulative_variance >= var) + 1
-    
-    # Step 7: Select the eigenvectors (principal components) corresponding to nd components
-    W = sorted_eigenvectors[:, :nd]
-    
-    # Step 8: Project the data onto the new principal component space
-    X_pca = np.dot(X_centered, W)
-    
-    # Return the projected data and the weight matrix
-    return X_pca, W
+        - n is the number of data points
+        - d is the number of dimensions for each data point
+        The dataset should already be centered (mean = 0 for each feature).
 
+    var : float, optional (default=0.95)
+        The fraction of the variance to preserve after the PCA transformation.
+
+    Returns:
+    W : numpy.ndarray of shape (d, k)
+        The matrix containing the principal components that explain the given
+        variance. The dataset X can be projected onto this matrix for
+        dimensionality reduction.
+    """
+    # Perform Singular Value Decomposition (SVD)
+    U, S, Vt = np.linalg.svd(X, full_matrices=False)
+
+    # Compute the explained variance for each singular value
+    explained_variance = (S ** 2) / np.sum(S ** 2)
+    
+    # Compute the cumulative explained variance
+    cumulative_variance = np.cumsum(explained_variance)
+
+    # Find the minimum number of components required to retain the target variance
+    k = np.searchsorted(cumulative_variance, var) + 1
+
+    # Extract the first k components (columns) from Vt, which correspond to the principal components
+    W = Vt[:k].T
+
+    return W
