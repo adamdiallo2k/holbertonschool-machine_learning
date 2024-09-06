@@ -1,34 +1,33 @@
 #!/usr/bin/env python3
+"""
+    PCA on a dataset
+"""
 import numpy as np
+
 
 def pca(X, ndim):
     """
-    Performs Principal Component Analysis (PCA) on the dataset X and reduces its dimensionality.
+    Function that performs PCA on a dataset
 
-    Args:
-    X : numpy.ndarray of shape (n, d)
-        The dataset where n is the number of data points and d is the number of dimensions.
-    ndim : int
-        The new dimensionality of the transformed X.
+    :param X: numpy.ndarray of shape (n, d) where:
+        - n is the number of data points
+        - d is the number of dimensions in each point
+    :param ndim: new dimensionality of the transformed X
 
-    Returns:
-    T : numpy.ndarray of shape (n, ndim)
-        The transformed version of X with reduced dimensionality.
+    :return: T, a numpy.ndarray of shape (n, ndim)
+        containing the transformed version of X
     """
-    # Step 1: Compute the covariance matrix of the dataset X
-    cov_matrix = np.cov(X, rowvar=False)
-    
-    # Step 2: Perform Eigen Decomposition on the covariance matrix
-    eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
-    
-    # Step 3: Sort the eigenvalues and eigenvectors in descending order
-    sorted_indices = np.argsort(eigenvalues)[::-1]
-    sorted_eigenvectors = eigenvectors[:, sorted_indices]
-    
-    # Step 4: Select the top 'ndim' eigenvectors
-    W = sorted_eigenvectors[:, :ndim]
-    
-    # Step 5: Transform the dataset X to the new lower-dimensional space
-    T = np.dot(X, W)
-    
+
+    # normalize
+    X = X - np.mean(X, axis=0)
+
+    # Calculate the SVD of input data
+    U, S, V = np.linalg.svd(X, full_matrices=False)
+
+    # select first ndim
+    W = V[:ndim].T
+
+    # Apply the transformation to X
+    T = X @ W
+
     return T
