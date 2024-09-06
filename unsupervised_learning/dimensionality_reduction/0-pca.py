@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 
 def pca(X, var=0.95):
     """
@@ -18,32 +17,33 @@ def pca(X, var=0.95):
         The weights matrix that maintains var fraction of X's original variance.
         nd is the new dimensionality of the transformed X.
     """
-    # Step 0: Optional - Standardize the data
-    scaler = StandardScaler()
-    X_std = scaler.fit_transform(X)
+    # Step 1: Standardize the data by subtracting the mean and dividing by the standard deviation
+    X_mean = np.mean(X, axis=0)
+    X_std = np.std(X, axis=0)
+    X_centered = (X - X_mean) / X_std
     
-    # Step 1: Compute the covariance matrix of the standardized dataset
-    cov_matrix = np.cov(X_std, rowvar=False)
+    # Step 2: Compute the covariance matrix of the standardized dataset
+    cov_matrix = np.cov(X_centered, rowvar=False)
     
-    # Step 2: Perform Eigen Decomposition on the covariance matrix using eigh (for symmetric matrices)
+    # Step 3: Perform Eigen Decomposition on the covariance matrix using eigh (for symmetric matrices)
     eigenvalues, eigenvectors = np.linalg.eigh(cov_matrix)
     
-    # Step 3: Sort the eigenvalues and eigenvectors in descending order
+    # Step 4: Sort the eigenvalues and eigenvectors in descending order
     sorted_indices = np.argsort(eigenvalues)[::-1]
     sorted_eigenvalues = eigenvalues[sorted_indices]
     sorted_eigenvectors = eigenvectors[:, sorted_indices]
     
-    # Step 4: Calculate the cumulative variance explained by each principal component
+    # Step 5: Calculate the cumulative variance explained by each principal component
     cumulative_variance = np.cumsum(sorted_eigenvalues) / np.sum(sorted_eigenvalues)
     
-    # Step 5: Determine the number of components that maintain the desired variance
+    # Step 6: Determine the number of components that maintain the desired variance
     nd = np.argmax(cumulative_variance >= var) + 1
     
-    # Step 6: Select the eigenvectors (principal components) corresponding to nd components
+    # Step 7: Select the eigenvectors (principal components) corresponding to nd components
     W = sorted_eigenvectors[:, :nd]
     
-    # Step 7: Project the data onto the new principal component space
-    X_pca = np.dot(X_std, W)
+    # Step 8: Project the data onto the new principal component space
+    X_pca = np.dot(X_centered, W)
     
     # Return the projected data and the weight matrix
     return X_pca, W
