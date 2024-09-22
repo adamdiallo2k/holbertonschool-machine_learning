@@ -1,65 +1,77 @@
 #!/usr/bin/env python3
+"""
+    This module contains the implementation of the Gaussian Process
+"""
 import numpy as np
 
 
 class GaussianProcess:
-    """Represents a noiseless 1D Gaussian process."""
-    
+    """
+        Noiseless 1D Gaussian process
+    """
+
     def __init__(self, X_init, Y_init, l=1, sigma_f=1):
         """
-        Class constructor
-        
-        Args:
-            X_init: numpy.ndarray of shape (t, 1) - inputs already sampled
-            Y_init: numpy.ndarray of shape (t, 1) - outputs of the black-box function
-            l: length parameter for the kernel
-            sigma_f: standard deviation of the output
+            class constructor
+
+        :param X_init: ndarray, shape(t,1) inputs already sampled with the
+            black-box function
+            t : number of initial samples
+        :param Y_init: ndarray, shape(t,1) outputs of the black-box function
+            for each input in X_init
+        :param l: length parameter for the kernel
+        :param sigma_f: standard deviation given to the output of the black-box
+            function
         """
-        self.X = X_init  # Sampled inputs
-        self.Y = Y_init  # Corresponding outputs
-        self.l = l  # Length scale for the RBF kernel
-        self.sigma_f = sigma_f  # Standard deviation for the function
-        self.K = self.kernel(X_init, X_init)  # Covariance matrix of training points
-    
+        self.X = X_init
+        self.Y = Y_init
+        self.l = l
+        self.sigma_f = sigma_f
+        self.K = self.kernel(X_init, X_init)
+
     def kernel(self, X1, X2):
         """
-        Calculates the covariance kernel matrix between two matrices using the RBF kernel.
-        
-        Args:
-            X1: numpy.ndarray of shape (m, 1)
-            X2: numpy.ndarray of shape (n, 1)
-            
-        Returns:
-            Covariance kernel matrix as a numpy.ndarray of shape (m, n)
+            calculates covariance kernel matrix between two matrices
+            Kernel use the Radial Basis Function(RBF)
+
+        :param X1: ndarray, shape(m,1)
+        :param X2: ndarray, shape(n,1)
+
+        :return: cov kernel matrix
+                ndarray, shape(m,n)
         """
-        sqdist = np.sum(X1**2, axis=1).reshape(-1, 1) + np.sum(X2**2, axis=1) - 2 * X1 @ X2.T
-        return self.sigma_f**2 * np.exp(-0.5 * sqdist / self.l**2)
-    
+
+        dist_mtx = np.sum(X1 ** 2, 1).reshape(-1, 1) + \
+            np.sum(X2 ** 2, 1) - 2 * np.dot(X1, X2.T)
+        K = self.sigma_f ** 2 * np.exp(-0.5 / self.l ** 2 * dist_mtx)
+
+        return K
+
     def predict(self, X_s):
         """
-        Predicts the mean and standard deviation of points in a Gaussian process.
-        
-        Args:
-            X_s: numpy.ndarray of shape (s, 1) containing all of the points whose mean and variance should be calculated
-            s: number of sample points
-        
-        Returns:
-            mu: numpy.ndarray of shape (s,) containing the mean for each point in X_s, respectively
-            sigma: numpy.ndarray of shape (s,) containing the variance for each point in X_s, respectively
-        """
-        # Covariance between training data (X) and new points (X_s)
-        K_s = self.kernel(self.X, X_s)
-        # Covariance between the new points
-        K_ss = self.kernel(X_s, X_s)
-        # Inverse of the covariance matrix of the training data
-        K_inv = np.linalg.inv(self.K)
-        
-        # Compute the mean
-        mu_s = K_s.T @ K_inv @ self.Y
-        mu = mu_s.flatten()  # Convert to 1D array
+            predicts the mean and standard deviation of points
+            in a Gaussian process
 
-        # Compute the covariance (variance)
-        cov_s = K_ss - K_s.T @ K_inv @ K_s
-        sigma = np.diag(cov_s)  # Extract the diagonal (variances)
+        :param X_s: ndarray, shape(s,1) all of the points whose mean and
+            standard deviation should be calculated
+            s: number of sample points
+
+        :return: mu, sigma
+            mu: ndarray, shape(s,) mean for each point in X_s
+            sigma: ndarray, shape(s,) variance for each point in X_s
+        """
+
+        # cov matrix between the sample points X_s
+        K_ss = self.kernel(X_s, X_s)
+        # cross-cov between training points and sample point
+        K_s = self.kernel(self.X, X_s)
+        # inv of cov matrix K of training points
+        K_inv = np.linalg.inv(self.K)
+
+        # mu = dot product of K_s.T and K_inv multiply by self.Y
+        mu = np.dot(K_s.T, np.dot(K_inv, self.Y)).reshape(-1)
+        # sigma = diag of cov matrix K_ss minus the dot
+        # product of K_s.T, K_inv and K_s)
+        sigma = np.diag(K_ss - np.dot(K_s.T, np.dot(K_inv, K_s)))
 
         return mu, sigma
