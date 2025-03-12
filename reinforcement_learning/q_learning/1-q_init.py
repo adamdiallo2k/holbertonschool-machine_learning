@@ -8,7 +8,7 @@ import numpy as np
 def q_init(env):
     """
     Initialize the Q-table for a given FrozenLake environment
-    
+
     Parameters:
         env: the FrozenLakeEnv instance
 
