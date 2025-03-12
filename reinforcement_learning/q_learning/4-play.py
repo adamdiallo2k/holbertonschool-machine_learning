@@ -42,10 +42,31 @@ def play(env, Q, max_steps=100):
             3: "(Up)"
         }
         
+        # Add current position marker to the render
+        state_row = state // env.unwrapped.ncol
+        state_col = state % env.unwrapped.ncol
+        
+        # Create a modified render with marker for current position
+        lines = render.strip().split('\n')
+        for i, line in enumerate(lines):
+            if i == state_row:
+                # Replace character at current position with quoted version
+                new_line = ''
+                for j, char in enumerate(line):
+                    if j == state_col:
+                        new_line += f'"{char}"'
+                    else:
+                        new_line += char
+                lines[i] = new_line
+        
+        marked_render = '\n'.join(lines)
+        
         # Display current state with action
-        if render is not None:
-            current_render = render + f"\n  {action_direction[action]}"
-            rendered_outputs.append(current_render)
+        current_render = marked_render
+        if step < max_steps - 1 and not done:  # Don't add direction to final state
+            current_render += f"\n  {action_direction[action]}"
+        
+        rendered_outputs.append(current_render)
         
         # Take action
         new_state, reward, done, _, _ = env.step(action)
@@ -59,10 +80,24 @@ def play(env, Q, max_steps=100):
         
         # Break if done
         if done:
+            # Add final state with position marker
+            if render is not None:
+                state_row = state // env.unwrapped.ncol
+                state_col = state % env.unwrapped.ncol
+                
+                lines = render.strip().split('\n')
+                for i, line in enumerate(lines):
+                    if i == state_row:
+                        new_line = ''
+                        for j, char in enumerate(line):
+                            if j == state_col:
+                                new_line += f'"{char}"'
+                            else:
+                                new_line += char
+                        lines[i] = new_line
+                
+                final_render = '\n'.join(lines)
+                rendered_outputs.append(final_render)
             break
-    
-    # Add final state render
-    if render is not None:
-        rendered_outputs.append(render)
     
     return total_rewards, rendered_outputs
