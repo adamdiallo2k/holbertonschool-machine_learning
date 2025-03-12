@@ -8,7 +8,7 @@ import numpy as np
 def epsilon_greedy(Q, state, epsilon):
     """
     Uses epsilon-greedy strategy to determine the next action
-    
+
     Parameters:
         Q: numpy.ndarray containing the q-table
         state: the current state
