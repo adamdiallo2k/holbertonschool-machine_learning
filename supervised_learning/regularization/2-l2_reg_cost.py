@@ -1,49 +1,59 @@
+Write the function def l2_reg_cost(cost, model): that calculates the cost of a neural network with L2 regularization:
+
+cost is a tensor containing the cost of the network without L2 regularization
+model is a Keras model that includes layers with L2 regularization
+Returns: a tensor containing the total cost for each layer of the network, accounting for L2 regularization
+Note: To accompany the following main file, you are provided with a Keras model saved in the file model_reg.h5. The architecture of this model includes:
+
+an input layer
+two hidden layers with tanh and sigmoid activations, respectively
+an output layer with softmax activation
+L2 regularization is applied to all layers
+ubuntu@alexa-ml:~/regularization$ cat 2-main.py
 #!/usr/bin/env python3
-"""
-Calculate the cost of a neural network with L2 regularization.
-"""
 
+import numpy as np
 import tensorflow as tf
+import os
+import random
 
+SEED = 0
 
-def l2_reg_cost(cost):
-    """
-    Adds L2 regularization losses to the base cost of the neural network.
+os.environ['PYTHONHASHSEED'] = str(SEED)
+os.environ['TF_ENABLE_ONEDNN_OPTS']= '0'
+random.seed(SEED)
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
 
-    :param cost: Tensor, the base cost (e.g., cross-entropy loss) without L2 regularization.
-    :return: Tensor, the total cost including L2 regularization losses.
-    """
-    # Sum all regularization losses
-    regularization_losses = tf.add_n(tf.keras.losses.get_regularization_losses())
+l2_reg_cost = __import__('2-l2_reg_cost').l2_reg_cost
 
-    # Combine the base cost with regularization losses
-    total_cost = cost + regularization_losses
+def one_hot(Y, classes):
+    """convert an array to a one-hot matrix"""
+    m = Y.shape[0]
+    oh = np.zeros((m, classes))
+    oh[np.arange(m), Y] = 1
+    return oh
 
-    return total_cost
+m = np.random.randint(1000, 2000)
+c = 10
+lib= np.load('MNIST.npz')
 
+X = lib['X_train'][:m].reshape((m, -1))
+Y = one_hot(lib['Y_train'][:m], c)
 
-# Main function to test the L2 regularization cost
-if __name__ == "__main__":
-    # Define a simple model with L2 regularization
-    model = tf.keras.Sequential([
-        tf.keras.layers.Dense(128, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(0.01)),
-        tf.keras.layers.Dense(10, activation='softmax', kernel_regularizer=tf.keras.regularizers.l2(0.01))
-    ])
+model_reg = tf.keras.models.load_model('model_reg.h5', compile=False)
 
-    # Example input: 3 samples, 64 features each
-    x = tf.random.normal((3, 64))
+Predictions = model_reg(X)
+cost = tf.keras.losses.CategoricalCrossentropy()(Y, Predictions)
 
-    # Example labels: 3 class labels
-    y = tf.random.uniform((3,), maxval=10, dtype=tf.int32)
+l2_cost = l2_reg_cost(cost,model_reg)
+print(l2_cost)
 
-    # Forward pass through the model
-    predictions = model(x, training=True)
+ubuntu@alexa-ml:~/regularization$ ./2-main.py
+tf.Tensor([121.24274   110.74535     6.1250796], shape=(3,), dtype=float32)
+ubuntu@alexa-ml:~/regularization$
+Repo:
 
-    # Compute base cost (categorical cross-entropy loss)
-    base_cost = tf.reduce_mean(tf.keras.losses.sparse_categorical_crossentropy(y, predictions))
-
-    # Compute the total cost with L2 regularization
-    total_cost = l2_reg_cost(base_cost)
-
-    # Print the total cost
-    print(total_cost)
+GitHub repository: holbertonschool-machine_learning
+Directory: supervised_learning/regularization
+File: 2-l2_reg_cost.py
