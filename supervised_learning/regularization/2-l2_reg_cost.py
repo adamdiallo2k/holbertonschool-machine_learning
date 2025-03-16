@@ -14,22 +14,19 @@ def l2_reg_cost(cost, model):
         model: Keras model that includes layers with L2 regularization
 
     Returns:
-        tensor containing the total cost including L2 regularization
+        tensor containing the regularization losses for each layer
     """
     # Get the L2 regularization losses from the model
     l2_losses = []
+    
+    # Collect regularization losses from each layer
     for layer in model.layers:
         # Check if the layer has regularization losses
         if hasattr(layer, 'losses') and layer.losses:
             l2_losses.extend(layer.losses)
     
-    # If there are L2 regularization losses, add them to the original cost
+    # Return the regularization losses as a tensor
     if l2_losses:
-        # Sum all the regularization losses
-        l2_loss = tf.add_n(l2_losses)
-        # Add the regularization loss to the original cost
-        total_cost = cost + l2_loss
+        return tf.convert_to_tensor(l2_losses)
     else:
-        total_cost = cost
-    
-    return total_cost
+        return tf.constant(0.0)
