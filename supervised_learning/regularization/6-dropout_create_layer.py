@@ -20,7 +20,8 @@ def dropout_create_layer(prev, n, activation, keep_prob, training=True):
         output of the new layer
     """
     # Initialize weights using He et al. method
-    initializer = tf.keras.initializers.VarianceScaling(scale=2.0, mode='fan_avg')
+    initializer = tf.keras.initializers.VarianceScaling(
+        scale=2.0, mode='fan_avg')
 
     # Create the layer with the specified number of nodes
     layer = tf.keras.layers.Dense(
