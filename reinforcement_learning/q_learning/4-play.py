@@ -25,18 +25,21 @@ def play(env, Q, max_steps=100):
     total_rewards = 0
     rendered_outputs = []
     
-    # Get the initial render
-    rendered_outputs.append(env.render())
-    
     # Play the episode
     for _ in range(max_steps):
+        # Get the current render and replace the position marker with quotes
+        current_render = env.render()
+        
         # Choose the action with the highest Q-value for the current state (exploitation)
         action = np.argmax(Q[state, :])
         
         # Take the action and observe the next state and reward
         next_state, reward, done, _, _ = env.step(action)
         
-        # Add the action taken to the rendered output
+        # Add the current render to the outputs
+        rendered_outputs.append(current_render)
+        
+        # Add the action taken to the rendered output if not done
         if not done:
             # Map action to direction
             direction = {0: "Left", 1: "Down", 2: "Right", 3: "Up"}
@@ -48,11 +51,11 @@ def play(env, Q, max_steps=100):
         # Add the reward to the total rewards
         total_rewards += reward
         
-        # Get the new render after taking the action
-        rendered_outputs.append(env.render())
-        
         # Check if the episode is done
         if done:
+            # Add the final render
+            rendered_outputs.append(env.render())
             break
     
     return total_rewards, rendered_outputs
+    
