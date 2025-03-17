@@ -3,6 +3,7 @@ import tensorflow.compat.v1 as tf
 
 tf.disable_eager_execution()
 
+
 def create_placeholders(nx, classes):
     """
     Returns two placeholders, x and y, for a neural network:
