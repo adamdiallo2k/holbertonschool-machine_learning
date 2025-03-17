@@ -2,7 +2,7 @@
 """
 Module to load and prepare dataset for machine translation
 """
-import tensorflow as tf
+
 import tensorflow_datasets as tfds
 from transformers import BertTokenizerFast
 
@@ -11,20 +11,24 @@ class Dataset:
     """
     Dataset class for machine translation
     """
+
     def __init__(self):
         """
-        Class constructor
-        Creates instance attributes
+        Class constructor that creates instance attributes:
+          - self.data_train
+          - self.data_valid
+          - self.tokenizer_pt
+          - self.tokenizer_en
         """
-        # Load datasets as supervised
+        # Load datasets as supervised from TFDS
         self.data_train = tfds.load(
-            'ted_hrlr_translate/pt_to_en',
-            split='train',
+            "ted_hrlr_translate/pt_to_en",
+            split="train",
             as_supervised=True
         )
         self.data_valid = tfds.load(
-            'ted_hrlr_translate/pt_to_en',
-            split='validation',
+            "ted_hrlr_translate/pt_to_en",
+            split="validation",
             as_supervised=True
         )
 
@@ -34,17 +38,18 @@ class Dataset:
     def tokenize_dataset(self, data):
         """
         Loads pretrained sub-word tokenizers for our dataset.
-
+        
         Args:
-            data: tf.data.Dataset whose examples are formatted as (pt, en)
+            data: A dataset loaded via tfds.load(), with each example as (pt_text, en_text)
 
         Returns:
             tokenizer_pt: Portuguese tokenizer
             tokenizer_en: English tokenizer
         """
-        # Portuguese tokenizer from neuralmind
+        # Portuguese tokenizer (NeuralMind BERT)
         tokenizer_pt = BertTokenizerFast.from_pretrained("neuralmind/bert-base-portuguese-cased")
-        # English tokenizer
+
+        # English tokenizer (BERT base uncased)
         tokenizer_en = BertTokenizerFast.from_pretrained("bert-base-uncased")
 
         return tokenizer_pt, tokenizer_en
