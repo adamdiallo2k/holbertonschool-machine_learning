@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
 Module 0-create_placeholders
-Provides a function `create_placeholders` that returns two TensorFlow placeholders.
+
+Provides a function `create_placeholders` that returns two TensorFlow
+placeholders.
 """
 
 import tensorflow.compat.v1 as tf
