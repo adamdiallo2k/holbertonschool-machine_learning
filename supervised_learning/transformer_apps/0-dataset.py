@@ -5,6 +5,7 @@ Module to load and prepare dataset for machine translation
 import tensorflow_datasets as tfds
 import transformers
 
+
 class Dataset:
     """
     Dataset class for machine translation
@@ -28,28 +29,30 @@ class Dataset:
             split="validation",
             as_supervised=True
         )
-
         # Create tokenizers (pretrained) from Hugging Face
         self.tokenizer_pt, self.tokenizer_en = self.tokenize_dataset(self.data_train)
 
     def tokenize_dataset(self, data):
         """
-        Loads pretrained sub-word tokenizers for our dataset.
+        Creates sub-word tokenizers for our dataset
         
         Args:
-            data: A dataset loaded via tfds.load(), with each example as (pt_text, en_text)
+            data: tf.data.Dataset whose examples are formatted as a tuple (pt, en)
         Returns:
             tokenizer_pt: Portuguese tokenizer
             tokenizer_en: English tokenizer
         """
-        # Portuguese tokenizer (NeuralMind BERT)
+        # Initialize the Portuguese tokenizer with pre-trained model
         tokenizer_pt = transformers.BertTokenizerFast.from_pretrained(
             "neuralmind/bert-base-portuguese-cased"
         )
-
-        # English tokenizer (BERT base uncased)
+        
+        # Initialize the English tokenizer with pre-trained model
         tokenizer_en = transformers.BertTokenizerFast.from_pretrained(
             "bert-base-uncased"
         )
-
+        
+        # Set the maximum vocabulary size to 2^13
+        vocab_size = 2**13
+        
         return tokenizer_pt, tokenizer_en
