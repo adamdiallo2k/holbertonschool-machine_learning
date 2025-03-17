@@ -1,27 +1,17 @@
 #!/usr/bin/env python3
-"""Commented module """
-
-
 import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
 
+tf.disable_eager_execution()
 
 def create_placeholders(nx, classes):
     """
-    Creates and returns two placeholders, x and y, for a neural network.
-
-    Arguments:
-    nx -- scalar, size of an image vector (num_px * num_px = nx)
-    classes -- scalar, number of classes (from 0 to classes-1)
-
-    Returns:
-    x -- placeholder for the data input, of shape 
-    [None, nx] and dtype "float"
-    y -- placeholder for the input labels, of shape [None, classes] 
-    and dtype "float"
+    Returns two placeholders, x and y, for a neural network:
+      - x is placeholder for the input data to the network
+      - y is placeholder for the one-hot labels
+    :param nx: number of feature columns in the data
+    :param classes: number of classes in the classifier
+    :return: placeholders x and y
     """
-
-    x = tf.placeholder(tf.float32, shape=[None, nx], name="x")
-    y = tf.placeholder(tf.float32, shape=[None, classes], name="y")
-
+    x = tf.placeholder(tf.float32, shape=(None, nx), name="x")
+    y = tf.placeholder(tf.float32, shape=(None, classes), name="y")
     return x, y
