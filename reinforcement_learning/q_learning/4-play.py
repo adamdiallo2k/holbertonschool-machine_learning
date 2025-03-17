@@ -1,61 +1,64 @@
 #!/usr/bin/env python3
 """
-Module for playing an episode using a trained Q-learning agent
+Module 4-play
+
+Provides a function `play` that has the trained agent play an episode on the
+FrozenLake environment.
 """
+
 import numpy as np
 
 
 def play(env, Q, max_steps=100):
     """
-    Has the trained agent play an episode using the Q-table for action selection
-    
+    Plays one episode using a trained Q-table on the FrozenLake environment.
+
     Args:
-        env: FrozenLakeEnv instance
-        Q: numpy.ndarray containing the Q-table
-        max_steps: maximum number of steps in the episode
-        
+        env: FrozenLakeEnv instance with render_mode="ansi".
+        Q (numpy.ndarray): Q-table containing the agent's learned values.
+        max_steps (int): Maximum number of steps in the episode.
+
     Returns:
-        total_rewards: float, total rewards for the episode
-        rendered_outputs: list, rendered outputs representing the board state at each step
+        tuple: (total_rewards, rendered_outputs)
+            - total_rewards (float): Total rewards for the episode.
+            - rendered_outputs (list): List of rendered outputs representing
+              the board state at each step.
     """
-    # Reset the environment
-    state, _ = env.reset()
-    
-    # Initialize rewards and rendered outputs
     total_rewards = 0
     rendered_outputs = []
-    
-    # Play the episode
+
+    # Retrieve the current state.
+    # It is assumed that env.reset() has been called prior to play.
+    try:
+        state = env.env.s
+    except AttributeError:
+        state = env.reset()
+
+    # Mapping of action indices to their names.
+    actions_dict = {0: "Left", 1: "Down", 2: "Right", 3: "Up"}
+
+    done = False
     for _ in range(max_steps):
-        # Get the current render and replace the position marker with quotes
-        current_render = env.render()
-        
-        # Choose the action with the highest Q-value for the current state (exploitation)
-        action = np.argmax(Q[state, :])
-        
-        # Take the action and observe the next state and reward
-        next_state, reward, done, _, _ = env.step(action)
-        
-        # Add the current render to the outputs
-        rendered_outputs.append(current_render)
-        
-        # Add the action taken to the rendered output if not done
-        if not done:
-            # Map action to direction
-            direction = {0: "Left", 1: "Down", 2: "Right", 3: "Up"}
-            rendered_outputs[-1] += f"\n  ({direction[action]})"
-        
-        # Update the state
-        state = next_state
-        
-        # Add the reward to the total rewards
+        # Always exploit the Q-table by choosing the best action.
+        action = int(np.argmax(Q[state]))
+
+        # Take the action in the environment.
+        next_state, reward, done, _ = env.step(action)
         total_rewards += reward
-        
-        # Check if the episode is done
-        if done:
-            # Add the final render
-            rendered_outputs.append(env.render())
+
+        # Render the current board state.
+        board = env.render()
+        if not done:
+            # Append the rendered board with the action taken.
+            rendered_outputs.append(board + "\n  (" + actions_dict[action] + ")")
+        else:
+            # Append the final rendered board without an action.
+            rendered_outputs.append(board)
             break
-    
+        state = next_state
+
+    # Ensure the final state is rendered if max_steps is reached without done.
+    if not done:
+        rendered_outputs.append(env.render())
+
     return total_rewards, rendered_outputs
-    
