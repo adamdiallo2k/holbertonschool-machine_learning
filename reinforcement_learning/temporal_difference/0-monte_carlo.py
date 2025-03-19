@@ -1,50 +1,55 @@
 #!/usr/bin/env python3
 """
-    Monte Carlo algorithm
+This is the Temporal difference Project
+it use the FrozenLake8x8-v1 environment
+beware, do not slide on the hole
+By Ced
 """
 import numpy as np
 
-def monte_carlo(env, V, policy, episodes=5000, max_steps=100,
-                alpha=0.1, gamma=0.99):
+
+def sample_episode(env, policy, max_steps=100):
     """
-        Implémente l'algorithme Monte Carlo
-
-    :param env: Instance de l'environnement OpenAI Gym
-    :param V: ndarray, valeur estimée des états (shape: (s,))
-    :param policy: Fonction qui prend un état et retourne l'action à effectuer
-    :param episodes: Nombre d'épisodes d'entraînement
-    :param max_steps: Nombre maximal d'étapes par épisode
-    :param alpha: Taux d'apprentissage
-    :param gamma: Facteur de réduction (discount)
-
-    :return: V mis à jour
+    Jouer un episode entier
     """
-    for _ in range(episodes):
-        # Réinitialisation de l'environnement
-        state, _ = env.reset()  # ✅ Correction ici
 
-        episode_data = []  # Stockage des (state, reward)
+    SAR_list = []
+    observation = 0  # le jouer debute en haut a gauche
+    env.reset()
+    for j in range(max_steps):
 
-        for _ in range(max_steps):
-            action = policy(state)  # Appliquer la politique
-            next_state, reward, done, _, _ = env.step(action)  # ✅ Correction ici
-            episode_data.append((state, reward))  # Enregistrer (état, récompense)
+        action = policy(observation)
 
-            if done:  # ✅ Correction ici
-                break
+        new_obs, reward, done, truncated, _ = env.step(action)
+        SAR_list.append((observation, reward))
 
-            state = next_state  # Mise à jour de l'état
+        if done or truncated:
+            break
 
-        # Mettre à jour la valeur des états
-        G = 0  # Retour cumulé
-        visited_states = set()  # ✅ Correction ici (suivi des états déjà vus)
+        observation = new_obs
+    return SAR_list
 
-        for state, reward in reversed(episode_data):
-            G = gamma * G + reward  # Calcul du retour actualisé
 
-            # Première visite uniquement
-            if state not in visited_states:
-                visited_states.add(state)  # ✅ Ajout de l'état visité
-                V[state] = V[state] + alpha * (G - V[state])  # Mise à jour de V
+def monte_carlo(env, V, policy, episodes=5000,
+                max_steps=100, alpha=0.1, gamma=0.99):
+    """
+    Utilise  Monte carlo, pour estimer la fonction de valeur
+    """
 
+    for episode in range(episodes):
+        # reset the environment and sample one episode
+        SAR_list = sample_episode(env, policy, max_steps)
+        SAR_list = np.array(SAR_list, dtype=int)
+
+        G = 0
+        for state, reward in reversed(SAR_list):
+            # return apres la fin de l'episode
+            G = reward + gamma * G
+            #print("G", G)
+            print("V", V[state])
+            # attention, si l'etat est nouveau ?!
+            if state not in SAR_list[:episode, 0]:
+                # Update the value function V(s)
+                V[state] = V[state] + alpha * (G - V[state])
+    env.close()
     return V
