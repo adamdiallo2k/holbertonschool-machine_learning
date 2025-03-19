@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Monte Carlo algorithm implementation
+Monte Carlo algorithm implementation for
+reinforcement learning value estimation
 """
 import numpy as np
 
@@ -21,40 +22,41 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0
     Returns:
         V: the updated value estimate
     """
-    # Iterate through episodes
+    # Loop through each episode
     for _ in range(episodes):
-        # Initialize episode
+        # Reset the environment
         state, _ = env.reset()
-        trajectory = []
         
-        # Generate trajectory
-        for t in range(max_steps):
-            # Get action from policy
+        # Initialize lists to store the state and reward information
+        states = []
+        rewards = []
+        
+        # Run the episode
+        for _ in range(max_steps):
+            # Choose action based on the policy
             action = policy(state)
             
             # Take action and observe next state and reward
             next_state, reward, terminated, truncated, _ = env.step(action)
-            done = terminated or truncated
             
-            # Store step information
-            trajectory.append((state, action, reward))
+            # Store state and reward
+            states.append(state)
+            rewards.append(reward)
             
             # Update state
             state = next_state
             
-            # Break if episode is done
-            if done:
+            # Check if episode is done
+            if terminated or truncated:
                 break
         
         # Calculate returns and update value function
         G = 0
-        for t in range(len(trajectory) - 1, -1, -1):
-            state, _, reward = trajectory[t]
+        for t in range(len(states) - 1, -1, -1):
+            # Calculate return
+            G = gamma * G + rewards[t]
             
-            # Calculate return with discount
-            G = gamma * G + reward
-            
-            # Update value function
-            V[state] = V[state] + alpha * (G - V[state])
+            # Update value estimate
+            V[states[t]] = V[states[t]] + alpha * (G - V[states[t]])
     
     return V
