@@ -25,36 +25,36 @@ def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0
     for _ in range(episodes):
         # Initialize episode
         state, _ = env.reset()
-        done = False
-        episode = []
+        trajectory = []
         
-        # Generate episode
-        for _ in range(max_steps):
-            # Break if episode is done
-            if done:
-                break
-                
+        # Generate trajectory
+        for t in range(max_steps):
             # Get action from policy
             action = policy(state)
             
             # Take action and observe next state and reward
-            next_state, reward, done, _, _ = env.step(action)
+            next_state, reward, terminated, truncated, _ = env.step(action)
+            done = terminated or truncated
             
             # Store step information
-            episode.append((state, action, reward))
+            trajectory.append((state, action, reward))
             
             # Update state
             state = next_state
-        
-        # Calculate returns for each step in the episode
-        G = 0
-        for t in range(len(episode) - 1, -1, -1):
-            state, _, reward = episode[t]
             
-            # Calculate return
+            # Break if episode is done
+            if done:
+                break
+        
+        # Calculate returns and update value function
+        G = 0
+        for t in range(len(trajectory) - 1, -1, -1):
+            state, _, reward = trajectory[t]
+            
+            # Calculate return with discount
             G = gamma * G + reward
             
-            # Update value estimate
+            # Update value function
             V[state] = V[state] + alpha * (G - V[state])
     
     return V
