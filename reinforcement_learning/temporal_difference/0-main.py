@@ -11,10 +11,12 @@ def set_seed(env, seed=0):
     np.random.seed(seed)
     random.seed(seed)
 
+
 env = gym.make('FrozenLake8x8-v1')
 set_seed(env, 0)
 
 LEFT, DOWN, RIGHT, UP = 0, 1, 2, 3
+
 
 def policy(s):
     p = np.random.uniform()
@@ -36,6 +38,7 @@ def policy(s):
             return LEFT
         else:
             return UP
+
 
 V = np.where(env.unwrapped.desc == b'H', -1, 1).reshape(64).astype('float64')
 np.set_printoptions(precision=4)
