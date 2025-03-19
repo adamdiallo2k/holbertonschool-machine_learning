@@ -1,53 +1,41 @@
 #!/usr/bin/env python3
-"""
-Monte Carlo algorithm implementation for
-reinforcement learning value estimation
-"""
-
 import numpy as np
-
 
 def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99):
     """
-    Performs the Monte Carlo algorithm for reinforcement learning
+    Performs the Monte Carlo algorithm to estimate the state-value function.
 
     Parameters:
-        env: environment instance (must have .reset() and .step() methods)
-        V: numpy.ndarray of shape (s,) containing the value estimate
-        policy: function that takes in a state and returns the next action to take
-        episodes: total number of episodes to train over
-        max_steps: maximum number of steps per episode
-        alpha: learning rate
-        gamma: discount rate
+        env: The environment instance.
+        V (numpy.ndarray): The state-value function estimate (shape: (s,)).
+        policy (function): A function that takes a state and returns the next action.
+        episodes (int): The total number of episodes for training.
+        max_steps (int): The maximum number of steps per episode.
+        alpha (float): The learning rate.
+        gamma (float): The discount factor.
 
     Returns:
-        V: the updated value estimate (numpy.ndarray of shape (s,))
+        numpy.ndarray: The updated state-value function V.
     """
     for _ in range(episodes):
-        # Reset the environment at the start of each episode
-        state, _ = env.reset()
-
-        # Lists to store the states visited and rewards received in the episode
-        states = []
-        rewards = []
-
-        # Generate one full episode
+        # Generate an episode using the policy
+        state = env.reset()[0]  # Reset environment and get initial state
+        episode = []
         for _ in range(max_steps):
-            action = policy(state)
-            next_state, reward, terminated, truncated, _ = env.step(action)
-
-            states.append(state)
-            rewards.append(reward)
-
+            action = policy(state)  # Select action based on policy
+            next_state, reward, done, _, _ = env.step(action)  # Take action
+            episode.append((state, reward))  # Store state and reward
             state = next_state
-            if terminated or truncated:
+            if done:
                 break
 
-        # Backward pass to update state values
-        G = 0
-        for t in range(len(states) - 1, -1, -1):
-            G = gamma * G + rewards[t]
-            # Update V for each visited state
-            V[states[t]] = V[states[t]] + alpha * (G - V[states[t]])
+        # Compute the returns and update V using incremental mean update
+        G = 0  # Initialize return
+        visited_states = set()
+        for state, reward in reversed(episode):
+            G = gamma * G + reward  # Compute return
+            if state not in visited_states:  # First-visit MC update
+                visited_states.add(state)
+                V[state] = V[state] + alpha * (G - V[state])  # Update state-value estimate
 
     return V
