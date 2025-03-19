@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TD(λ) algorithm
+TD(λ) algorithm - Optimized version
 """
 import numpy as np
 
@@ -25,23 +25,26 @@ def td_lambtha(env, V, policy, lambtha, episodes=5000, max_steps=100,
     for _ in range(episodes):
         # Réinitialisation de l'environnement
         state, _ = env.reset()
-
+        
         # Initialisation des traces d'éligibilité
-        eligibility_traces = np.zeros_like(V)  
+        eligibility_traces = np.zeros_like(V)
 
         for _ in range(max_steps):
             action = policy(state)  # Choix de l'action selon la politique
             next_state, reward, done, _, _ = env.step(action)  # Exécuter l'action
-
+            
             # Calcul de l'erreur TD
-            td_error = reward + gamma * V[next_state] * (not done) - V[state]
+            td_target = reward + (gamma * V[next_state] if not done else 0)
+            td_error = td_target - V[state]
 
-            # Mise à jour des traces d’éligibilité
-            eligibility_traces[state] += 1  # Augmente l'importance de cet état
+            # Mise à jour des traces d’éligibilité (Remplacement au lieu d'addition)
+            eligibility_traces[state] = 1  # Remise à 1 au lieu d'ajouter 1
 
             # Mise à jour de la valeur des états
             V += alpha * td_error * eligibility_traces  # Correction pondérée par les traces
-            eligibility_traces *= gamma * lambtha  # Atténuation exponentielle des traces
+            
+            # Atténuation exponentielle des traces
+            eligibility_traces *= gamma * lambtha  
 
             if done:
                 break  # Arrêter l'épisode si état terminal
