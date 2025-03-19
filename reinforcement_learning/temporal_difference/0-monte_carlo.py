@@ -6,55 +6,48 @@ reinforcement learning value estimation
 
 import numpy as np
 
+
 def monte_carlo(env, V, policy, episodes=5000, max_steps=100, alpha=0.1, gamma=0.99):
     """
     Performs the Monte Carlo algorithm for reinforcement learning
 
     Parameters:
-        env: environment instance
+        env: environment instance (must have .reset() and .step() methods)
         V: numpy.ndarray of shape (s,) containing the value estimate
         policy: function that takes in a state and returns the next action to take
         episodes: total number of episodes to train over
         max_steps: maximum number of steps per episode
         alpha: learning rate
-        gamma: discount factor
+        gamma: discount rate
 
     Returns:
-        V: the updated value estimate
+        V: the updated value estimate (numpy.ndarray of shape (s,))
     """
-    # Loop through each episode
     for _ in range(episodes):
-        # Reset the environment
+        # Reset the environment at the start of each episode
         state, _ = env.reset()
 
-        # Initialize lists to store states and rewards
+        # Lists to store the states visited and rewards received in the episode
         states = []
         rewards = []
 
-        # Run the episode
+        # Generate one full episode
         for _ in range(max_steps):
-            # Choose action based on the policy
             action = policy(state)
-
-            # Take the action and observe the next state and reward
             next_state, reward, terminated, truncated, _ = env.step(action)
 
-            # Store the current state and received reward
             states.append(state)
             rewards.append(reward)
 
-            # Update state
             state = next_state
-
-            # If the episode ends, break out of the loop
             if terminated or truncated:
                 break
 
-        # Calculate returns in reverse and update the value function
+        # Backward pass to update state values
         G = 0
         for t in range(len(states) - 1, -1, -1):
-            G = gamma * G + rewards[t]  # Accumulate discounted return
-            # Update V for the visited state
+            G = gamma * G + rewards[t]
+            # Update V for each visited state
             V[states[t]] = V[states[t]] + alpha * (G - V[states[t]])
 
     return V
