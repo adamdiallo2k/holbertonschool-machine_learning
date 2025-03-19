@@ -1,57 +1,57 @@
 #!/usr/bin/env python3
 """
-TD(λ) algorithm for value estimation
+Temporal Difference Lambda (TD-λ) Learning Algorithm
 """
 import numpy as np
 
-def td_lambtha(env, V, policy, lambtha=0.9, episodes=5000, max_steps=100,
+def td_lambtha(env, V, policy, lambtha=0.9, episodes=5000, max_steps=100, 
                alpha=0.1, gamma=0.99):
     """
-    Implements the TD(λ) algorithm to estimate the value function.
+    Applies the TD(λ) algorithm to estimate the value function for an environment.
 
     Parameters:
-        env (object): The environment instance.
-        V (numpy.ndarray): Array of shape (s,) representing state-value estimates.
-        policy (function): Function that takes a state and returns an action.
-        lambtha (float): The eligibility trace decay factor (default: 0.9).
-        episodes (int): Number of training episodes (default: 5000).
-        max_steps (int): Maximum steps per episode (default: 100).
-        alpha (float): Learning rate (default: 0.1).
+        env: The reinforcement learning environment.
+        V (numpy.ndarray): Array storing the estimated value function for each state.
+        policy (function): Function mapping a state to an action.
+        lambtha (float): The decay factor for eligibility traces (default: 0.9).
+        episodes (int): Number of episodes for training (default: 5000).
+        max_steps (int): Maximum steps allowed per episode (default: 100).
+        alpha (float): Learning rate controlling the update step (default: 0.1).
         gamma (float): Discount factor for future rewards (default: 0.99).
 
     Returns:
-        numpy.ndarray: The updated state-value function V.
+        numpy.ndarray: The updated value function after training.
     """
     for _ in range(episodes):
-        # Start a new episode and get the initial state
-        state, _ = env.reset()
-        
-        # Initialize eligibility traces for all states to zero
-        traces = np.zeros_like(V)
+        # Reset environment and obtain the starting state
+        current_state, _ = env.reset()
+
+        # Initialize the eligibility trace for all states
+        trace_memory = np.zeros_like(V)
 
         for _ in range(max_steps):
-            # Choose an action using the policy
-            action = policy(state)
-            
-            # Execute the chosen action and observe the result
-            next_state, reward, done, _, _ = env.step(action)
+            # Determine action using the given policy
+            chosen_action = policy(current_state)
 
-            # Compute the Temporal Difference (TD) error
-            td_error = reward + (gamma * V[next_state] - V[state])
+            # Execute action and retrieve the next state and reward
+            next_state, reward, done, _, _ = env.step(chosen_action)
 
-            # Increase the eligibility trace for the current state
-            traces[state] += 1  
+            # Compute the temporal difference error
+            delta = reward + gamma * V[next_state] - V[current_state]
 
-            # Update the value function V using the eligibility traces
-            V += alpha * td_error * traces  
+            # Increase eligibility trace for the current state
+            trace_memory[current_state] += 1  
 
-            # Decay the eligibility traces for all states
-            traces *= gamma * lambtha  
+            # Apply updates to all state values using eligibility traces
+            V += alpha * delta * trace_memory  
+
+            # Reduce eligibility traces across all states
+            trace_memory *= gamma * lambtha  
 
             # Move to the next state
-            state = next_state
+            current_state = next_state
 
-            # End episode if terminal state is reached
+            # Terminate episode if the state is terminal
             if done:
                 break  
 
