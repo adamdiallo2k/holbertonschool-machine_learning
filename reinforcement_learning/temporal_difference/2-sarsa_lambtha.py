@@ -1,92 +1,87 @@
 #!/usr/bin/env python3
 """
-Implementation of the SARSA(λ) algorithm with eligibility traces.
-This variant has been refactored to keep the same functionality 
-but features rephrased commentary.
+SARSA(λ) algorithm (with eligibility traces), corrected version.
 """
 import numpy as np
 
 
 def epsilon_greedy(Q, state, epsilon):
     """
-    Selects an action according to the epsilon-greedy approach.
+    Determines the next action using the epsilon-greedy policy.
 
-    Args:
-        Q (np.ndarray): Q-table mapping state-action pairs to values.
-        state (int): Index of the current state.
-        epsilon (float): Probability of choosing a random action 
-                         rather than the best-known one.
+    Parameters:
+        Q (numpy.ndarray): The Q-table, where each entry Q[s, a] represents
+                           the expected reward for state `s` and action `a`.
+        state (int): The current state.
+        epsilon (float): The epsilon value for the epsilon-greedy policy.
 
     Returns:
-        int: Chosen action index.
+        int: The index of the action to take next.
     """
-    # Decide whether to exploit (greedy) or explore (random) based on epsilon
-    if np.random.rand() > epsilon:
-        # Utilize the best action from Q-table
-        return np.argmax(Q[state, :])
+    # Random exploration vs. greedy exploitation
+    if np.random.uniform(0, 1) > epsilon:
+        return np.argmax(Q[state])
     else:
-        # Pick a random valid action
         return np.random.randint(0, Q.shape[1])
 
 
-def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100, alpha=0.1,
-                  gamma=0.99, epsilon=1, min_epsilon=0.1, epsilon_decay=0.05):
+def sarsa_lambtha(env, Q, lambtha, episodes=5000, max_steps=100,
+                  alpha=0.1, gamma=0.99, epsilon=1.0,
+                  min_epsilon=0.1, epsilon_decay=0.05):
     """
-    Executes the SARSA(λ) algorithm on a given environment to refine the Q-table.
+    Performs the SARSA(λ) algorithm (with eligibility traces) to estimate
+    a Q-table.
 
-    Args:
-        env: The environment (e.g., a FrozenLake instance).
-        Q (np.ndarray): Q-table to be updated.
-        lambtha (float): Coefficient for eligibility trace decay.
-        episodes (int): Number of full training episodes.
-        max_steps (int): Cap on steps per episode.
-        alpha (float): Learning rate for Q updates.
-        gamma (float): Discount factor for future rewards.
-        epsilon (float): Initial probability for random action selection.
-        min_epsilon (float): Lower limit for epsilon as it decays.
-        epsilon_decay (float): Rate controlling how quickly epsilon falls.
+    Parameters:
+        env (gym.Env): The environment instance (e.g., FrozenLake).
+        Q (np.ndarray): The Q-table to update.
+        lambtha (float): The eligibility trace factor (λ).
+        episodes (int): The total number of episodes to train over.
+        max_steps (int): The maximum number of steps per episode.
+        alpha (float): The learning rate.
+        gamma (float): The discount rate.
+        epsilon (float): The initial threshold for epsilon-greedy.
+        min_epsilon (float): The lower bound for epsilon.
+        epsilon_decay (float): The decay rate for epsilon per episode.
 
     Returns:
-        np.ndarray: The updated Q-table after training completes.
+        np.ndarray: The updated Q-table after training.
     """
-    init_eps = epsilon
+    initial_epsilon = epsilon
 
     for episode in range(episodes):
-        # Reset the environment and pick the initial action
-        state = env.reset()[0]
+        # Reset environment and get initial state
+        state = env.reset()[0]  # for newer gym versions, reset() returns (obs, info)
         action = epsilon_greedy(Q, state, epsilon)
 
-        # Initialize all eligibility traces to zero
-        traces = np.zeros_like(Q)
+        # Initialize eligibility traces to zero
+        eligibility_traces = np.zeros_like(Q)
 
         for _ in range(max_steps):
-            # Execute the chosen action
+            # Interact with the environment
             next_state, reward, done, truncated, _ = env.step(action)
-
-            # Select the subsequent action
             next_action = epsilon_greedy(Q, next_state, epsilon)
 
-            # Compute the TD Error (delta)
+            # Compute TD error
             delta = reward + gamma * Q[next_state, next_action] - Q[state, action]
 
-            # Update eligibility trace for the current state-action
-            traces[state, action] += 1
+            # Decay all traces
+            eligibility_traces *= gamma * lambtha
 
-            # Decay all traces by gamma and lambda
-            traces *= gamma * lambtha
+            # Increase trace for the visited (state, action)
+            eligibility_traces[state, action] += 1
 
-            # Adjust Q-values in proportion to TD error and trace
-            Q += alpha * delta * traces
+            # Update Q-values
+            Q += alpha * delta * eligibility_traces
 
-            # Transition to the next state and action
-            state = next_state
-            action = next_action
+            # Move to the next state/action
+            state, action = next_state, next_action
 
-            # Break if the episode ends
             if done or truncated:
                 break
 
-        # Gradually reduce epsilon after each episode
-        epsilon = min_epsilon + (init_eps - min_epsilon) * np.exp(-epsilon_decay * episode)
+        # Exponential decay of epsilon after each episode
+        epsilon = min_epsilon + (initial_epsilon - min_epsilon) * \
+                  np.exp(-epsilon_decay * episode)
 
     return Q
