@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-""" commented module """
+
+
 import numpy as np
+
 
 def policy_gradient(state, weight):
     """
@@ -8,13 +10,15 @@ def policy_gradient(state, weight):
     and weight matrix for a 2-action environment.
 
     Args:
-        state: 1D numpy array of shape (n,) representing the current observation.
-        weight: 2D numpy array of shape (n, 2) representing the weight matrix.
+        state (ndarray): 1D numpy array of shape (n,) representing the current
+            observation.
+        weight (ndarray): 2D numpy array of shape (n, 2) representing the
+            weight matrix.
 
     Returns:
-        action: The sampled action (0 or 1).
-        grad:   The gradient of log π(action|state) w.r.t. the weights,
-                with the same shape as weight (n, 2).
+        action (int): The sampled action (0 or 1).
+        grad (ndarray): The gradient of log π(action|state) w.r.t. the weights,
+            with the same shape as weight (n, 2).
     """
     # 1) Compute logits for each action: logits = state ⋅ weight
     logits = state @ weight  # shape (2,)
