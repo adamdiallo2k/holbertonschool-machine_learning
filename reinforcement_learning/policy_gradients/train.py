@@ -32,7 +32,6 @@ def policy_gradient(state, weight):
     # Reshape state if it's not a 2D array
     if len(state.shape) == 1:
         state = state.reshape(1, -1)
-
     # Get policy probabilities
     policy_probs = policy(state, weight)
     
