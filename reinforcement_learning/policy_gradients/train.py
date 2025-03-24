@@ -8,11 +8,9 @@ import numpy as np
 def policy(state, weight):
     """
     Computes the policy with a weight of a matrix
-
     Args:
         state: numpy.ndarray containing the state input
         weight: numpy.ndarray containing the weight matrix
-
     Returns:
         The policy for the given state and weight
     """
@@ -25,11 +23,9 @@ def policy(state, weight):
 def policy_gradient(state, weight):
     """
     Computes the Monte-Carlo policy gradient based on a state and a weight matrix
-
     Args:
         state: matrix representing the current observation of the environment
         weight: matrix of random weight
-
     Returns:
         action and the gradient (in this order)
     """
