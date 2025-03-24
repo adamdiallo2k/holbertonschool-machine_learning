@@ -1,22 +1,36 @@
 #!/usr/bin/env python3
-"""
-Module containing policy gradient functions
-"""
+""" commented module """
 import numpy as np
 
-
-def policy(state, weight):
+def policy_gradient(state, weight):
     """
-    Computes the policy with a weight of a matrix
+    Computes the Monte-Carlo policy gradient based on a given state
+    and weight matrix for a 2-action environment.
 
     Args:
-        state: numpy.ndarray containing the state input
-        weight: numpy.ndarray containing the weight matrix
+        state: 1D numpy array of shape (n,) representing the current observation.
+        weight: 2D numpy array of shape (n, 2) representing the weight matrix.
 
     Returns:
-        The policy for the given state and weight
+        action: The sampled action (0 or 1).
+        grad:   The gradient of log π(action|state) w.r.t. the weights,
+                with the same shape as weight (n, 2).
     """
-    # Compute the softmax of the dot product of state and weight
-    z = np.dot(state, weight)
-    exp_z = np.exp(z)
-    return exp_z / np.sum(exp_z, axis=1, keepdims=True)
+    # 1) Compute logits for each action: logits = state ⋅ weight
+    logits = state @ weight  # shape (2,)
+
+    # 2) Apply softmax to get action probabilities
+    #    (subtract max(logits) for numerical stability)
+    exp_logits = np.exp(logits - np.max(logits))
+    probs = exp_logits / np.sum(exp_logits)
+
+    # 3) Sample an action according to the probabilities
+    action = np.random.choice([0, 1], p=probs)
+
+    # 4) Compute gradient = state * (one_hot(action) - probs)
+    #    Shape of grad should be (n, 2), same as weight
+    grad = np.zeros_like(weight)
+    for a in range(2):
+        grad[:, a] = state * ((1 if a == action else 0) - probs[a])
+
+    return action, grad
