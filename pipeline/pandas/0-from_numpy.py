@@ -4,6 +4,7 @@ Creates a pd.DataFrame from a np.ndarray
 """
 import pandas as pd
 
+
 def from_numpy(array):
     """
     Creates a pd.DataFrame from a np.ndarray
@@ -20,7 +21,7 @@ def from_numpy(array):
     # Alphabet en dur, pour générer les labels de colonnes
     alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     
-    # Génère les labels pour les colonnes (A, B, C, ...) 
+    # Génère les labels pour les colonnes (A, B, C, ...)
     # en se limitant à 26 caractères max
     column_labels = list(alphabet[:min(num_cols, 26)])
     
@@ -28,6 +29,7 @@ def from_numpy(array):
     df = pd.DataFrame(array, columns=column_labels)
     
     return df
+
 
 # Exemple d'utilisation (à titre de test seulement) :
 if __name__ == "__main__":
