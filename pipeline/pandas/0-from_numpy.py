@@ -2,9 +2,9 @@
 """
 Creates a pd.DataFrame from a np.ndarray
 """
+import numpy as np
 import pandas as pd
 import string
-
 
 def from_numpy(array):
     """
@@ -27,3 +27,14 @@ def from_numpy(array):
     df = pd.DataFrame(array, columns=column_labels)
     
     return df
+
+# Exemple d'utilisation :
+if __name__ == "__main__":
+    # Création d'un array NumPy de démonstration
+    data = np.array([[1, 2, 3],
+                     [4, 5, 6],
+                     [7, 8, 9]])
+    
+    # Conversion en DataFrame
+    df_result = from_numpy(data)
+    print(df_result)
