@@ -4,24 +4,18 @@ Module that selects the last 10 rows from 'High' and 'Close' columns
 of a DataFrame and returns them as a NumPy array.
 """
 
-import pandas as pd
-
-
 def array(df):
     """
     Selects the last 10 rows of the 'High' and 'Close' columns from df
     and converts them to a NumPy array.
-    
+
     Args:
-        df (pd.DataFrame): DataFrame containing columns named 'High' and 'Close'.
-    
+        df: A DataFrame-like object with 'High' and 'Close' columns.
+
     Returns:
-        numpy.ndarray: The selected values as a NumPy array.
+        The selected values as a NumPy array.
     """
-    # Select the last 10 rows of 'High' and 'Close'
-    selected_df = df[['High', 'Close']].tail(10)
-    
-    # Convert the selected data to a NumPy array
-    arr = selected_df.to_numpy()
-    
-    return arr
+    # Select the last 10 rows of 'High' and 'Close' columns
+    last_ten = df[['High', 'Close']].tail(10)
+    # Convert to a NumPy array
+    return last_ten.to_numpy()
