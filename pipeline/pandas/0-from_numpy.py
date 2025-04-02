@@ -10,10 +10,12 @@ def from_numpy(array):
     Creates a pd.DataFrame from a np.ndarray
     
     Parameters:
-        array: The NumPy array to convert (assumes it's already defined externally)
+        array: The NumPy array to convert (assumes it's already defined
+        externally)
         
     Returns:
-        pd.DataFrame: The newly created DataFrame with alphabetical column labels
+        pd.DataFrame: The newly created DataFrame with alphabetical column
+        labels
     """
     # Get number of columns in the array
     _, num_cols = array.shape
