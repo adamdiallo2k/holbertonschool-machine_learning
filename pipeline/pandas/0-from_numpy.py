@@ -2,16 +2,14 @@
 """
 Creates a pd.DataFrame from a np.ndarray
 """
-import numpy as np
 import pandas as pd
-import string
 
 def from_numpy(array):
     """
     Creates a pd.DataFrame from a np.ndarray
     
     Parameters:
-        array (np.ndarray): The NumPy array to convert
+        array: The NumPy array to convert (assumes it's already defined externally)
         
     Returns:
         pd.DataFrame: The newly created DataFrame with alphabetical column labels
@@ -19,21 +17,27 @@ def from_numpy(array):
     # Get number of columns in the array
     _, num_cols = array.shape
     
-    # Create column labels (A, B, C, ...) based on number of columns
-    # Ensure we don't exceed 26 columns (as per requirements)
-    column_labels = [string.ascii_uppercase[i] for i in range(min(num_cols, 26))]
+    # Alphabet en dur, pour générer les labels de colonnes
+    alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     
-    # Create DataFrame with the array and column labels
+    # Génère les labels pour les colonnes (A, B, C, ...) 
+    # en se limitant à 26 caractères max
+    column_labels = list(alphabet[:min(num_cols, 26)])
+    
+    # Crée le DataFrame avec les labels de colonne
     df = pd.DataFrame(array, columns=column_labels)
     
     return df
 
-# Exemple d'utilisation :
+# Exemple d'utilisation (à titre de test seulement) :
 if __name__ == "__main__":
-    # Création d'un array NumPy de démonstration
-    data = np.array([[1, 2, 3],
-                     [4, 5, 6],
-                     [7, 8, 9]])
+    # Supposons que 'data' soit un np.ndarray déjà défini ailleurs ;
+    # on montre ici un tableau d'exemple en pur Python pour la démo :
+    data = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]
+    ]
     
     # Conversion en DataFrame
     df_result = from_numpy(data)
