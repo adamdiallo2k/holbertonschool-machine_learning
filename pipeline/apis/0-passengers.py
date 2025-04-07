@@ -4,7 +4,9 @@ Returns a list of ships from the SWAPI (https://swapi.dev/api/starships)
 that can hold at least a given number of passengers.
 """
 
+
 import requests
+
 
 def availableShips(passengerCount):
     """
@@ -25,8 +27,8 @@ def availableShips(passengerCount):
         data = response.json()
 
         for starship in data.get('results', []):
-            # The 'passengers' field sometimes includes commas or may be "unknown"/"n/a"
             raw_passengers = starship.get('passengers', '0')
+            # Replace commas and strip extra spaces
             raw_passengers = raw_passengers.replace(',', '').strip()
 
             try:
@@ -37,7 +39,6 @@ def availableShips(passengerCount):
             if passenger_num >= passengerCount:
                 ships.append(starship['name'])
 
-        # Move to the next page, if any
         url = data.get('next')
 
     return ships
