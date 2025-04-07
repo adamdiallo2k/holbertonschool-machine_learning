@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Defines a function that trains a Gensim FastText model."""
-
 import gensim
 
 def fasttext_model(sentences, vector_size=100, min_count=5, negative=5, window=5, cbow=True, epochs=5, seed=0, workers=1):
