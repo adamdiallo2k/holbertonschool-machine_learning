@@ -1,44 +1,42 @@
 #!/usr/bin/env python3
 """
-Returns a list of ships from the SWAPI (https://swapi.dev/api/starships)
-that can hold at least a given number of passengers.
+Fetches and returns the list of home planets for all sentient species
+from the SWAPI (https://swapi.dev/api/species). A species is considered
+sentient if 'sentient' is in either its classification or designation.
 """
 
 
 import requests
 
 
-def availableShips(passengerCount):
+def sentientPlanets():
     """
-    Fetch starships from the SWAPI and return those that can hold
-    >= passengerCount passengers.
-
-    Args:
-        passengerCount (int): The minimum number of passengers required.
-
     Returns:
-        list of str: List of starship names meeting the criteria.
+        A list of planet names (strings) for all sentient species.
+        If a homeworld is not listed, 'unknown' is used.
     """
-    url = "https://swapi.dev/api/starships/"
-    ships = []
+    url = "https://swapi.dev/api/species/"
+    planets = []
 
     while url:
         response = requests.get(url)
         data = response.json()
 
-        for starship in data.get('results', []):
-            raw_passengers = starship.get('passengers', '0')
-            # Replace commas and strip extra spaces
-            raw_passengers = raw_passengers.replace(',', '').strip()
+        for species in data.get('results', []):
+            classification = species.get('classification', '').lower()
+            designation = species.get('designation', '').lower()
 
-            try:
-                passenger_num = int(raw_passengers)
-            except ValueError:
-                passenger_num = 0
-
-            if passenger_num >= passengerCount:
-                ships.append(starship['name'])
+            if 'sentient' in classification or 'sentient' in designation:
+                homeworld_url = species.get('homeworld')
+                if homeworld_url:
+                    try:
+                        world_resp = requests.get(homeworld_url).json()
+                        planets.append(world_resp.get('name', 'unknown'))
+                    except Exception:
+                        planets.append('unknown')
+                else:
+                    planets.append('unknown')
 
         url = data.get('next')
 
-    return ships
+    return planets
