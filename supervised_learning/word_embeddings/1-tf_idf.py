@@ -1,46 +1,37 @@
 #!/usr/bin/env python3
 """
-    TF-IDF
+Bag of words embedding matrix
 """
-import re
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def tf_idf(sentences, vocab=None):
     """
-            creates a TF-IDF embedding
+    Creates a TF-IDF embedding matrix.
 
-        :param sentences: list of sentences to analyse
-        :param vocab: list of vocabulary words to use for the analysis
-            if None: all words within sentences should be used
+    :param sentences:
+        A list of sentences to analyze
 
-        :return: embeddings, features
-            embeddings: ndarray, shape(s,f) containing embeddings
-                s: number of sentences in sentences
-                f: number of features analysed
-            features: list of the features used for embeddings
+    :param vocab:
+        sentences: list of sentences to analyze
+        vocab: list of vocabulary words to use for the analysis (optional).
+        If None, all words within sentences should be used
+
+    Returns:
+    `(embeddings, features)`
+    - `embeddings`: numpy.ndarray of shape `(s, f)` containing the embeddings
+      - `s` is the number of sentences
+      - `f` is the number of features analyzed
+    - `features`: list of the features used for embeddings
     """
+    # Initialize the  TF-IDF vectorizer with the given vocabulary
+    vectorizer = TfidfVectorizer(vocabulary=vocab)
 
-    if not isinstance(sentences, list):
-        raise TypeError("sentences should be a list.")
+    # Fit + transform the sentences to get the TF-IDF embeddings
+    embeddings = vectorizer.fit_transform(sentences)
 
-    preprocessed_sentences = []
-    for sentence in sentences:
-        preprocessed_sentence = re.sub(r"\b(\w+)'s\b", r"\1", sentence.lower())
-        preprocessed_sentences.append(preprocessed_sentence)
+    # Extract the features (words) used by the vectorizer
+    features = vectorizer.get_feature_names_out()
 
-    # extract features : list of words
-    list_words = []
-    for sentence in preprocessed_sentences:
-        words = re.findall(r'\w+', sentence)
-        list_words.extend(words)
-
-    if vocab is None:
-        vocab = sorted(set(list_words))
-
-    tfidf_vect = TfidfVectorizer(vocabulary=vocab)
-
-    tfidf_matrix = tfidf_vect.fit_transform(sentences)
-    features = tfidf_vect.get_feature_names()
-
-    return tfidf_matrix.toarray(), features
+    return embeddings.toarray(), features
