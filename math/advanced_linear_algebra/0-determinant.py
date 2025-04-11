@@ -1,65 +1,63 @@
-
 #!/usr/bin/env python3
+
 """
-    Determinant
+Determinant calculation
 """
 
 
-def sub_matrix(matrix, i):
+def validate_matrix(matrix):
     """
-        function to create submatrix 2x2
-
-        :param matrix: initial matrix
-        :param i: row, column to pop
-
-        :return: submatrix 2x2
+    Validates the type of the matrix (should be a list of lists)
     """
-    if not matrix:
-        return []
+    if (not isinstance(matrix, list) or len(matrix) == 0
+            or not all(isinstance(row, list) for row in matrix)):
+        raise TypeError("matrix must be a list of lists")
 
-    matrix2 = []
-    for row in matrix[1:]:
-        matrix2.append(row[:i] + row[i + 1:])
 
-    return matrix2
+def is_square(matrix):
+    """
+    Validates the shape of the matrix (should be square)
+    """
+    if any(len(row) != len(matrix) for row in matrix):
+        raise ValueError("matrix must be a square matrix")
 
 
 def determinant(matrix):
     """
-        function that calculates the determinant of a matrix
+    Calculate the determinant of a square matrix.
 
-        :param matrix: list of lists whose determinant should be calculated
+    Args:
+        matrix (list of list): The given matrix for determinant calculation.
 
-        :return: determinant of matrix
+    Returns:
+        float: The determinant of the matrix.
     """
-    # Test list of list format
-    if not isinstance(matrix, list) or len(matrix) == 0:
-        raise TypeError("matrix must be a list of lists")
-    for sub_list in matrix:
-        if not isinstance(sub_list, list):
-            raise TypeError("matrix must be a list of lists")
+    validate_matrix(matrix)
 
-    d = 0
-
-    # special case
-    if len(matrix[0]) == 0:
+    # Handle 0x0: empty matrix [[]], determinant is 1
+    if matrix == [[]]:
         return 1
 
-    # test square format of matrix
-    if len(matrix) != len(matrix[0]):
-        raise ValueError("matrix must be a square matrix")
+    is_square(matrix)
+    n = len(matrix)
 
-    # special case only one element
-    if len(matrix) == 1:
-        d = matrix[0][0]
-        return d
-    # simple matrix of 2x2
-    elif len(matrix) == 2:
-        d = matrix[0][0] * matrix[1][1] - matrix[1][0] * matrix[0][1]
-        return d
-    # recursiv action to sum all sub_matrix
-    else:
-        for i in range(len(matrix[0])):
-            d += (((-1) ** i) * matrix[0][i] *
-                  determinant(sub_matrix(matrix, i)))
-        return d
+    # Base case for 1x1 matrix
+    if n == 1:
+        return matrix[0][0]
+
+    # Base case for 2x2 matrix
+    if n == 2:
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+
+    # Recursive case: Laplace expansion, should work for a nxn matrix
+    det = 0
+    for col in range(n):
+        sub_matrix = [[matrix[row][c]
+                       for c in range(n) if c != col] for row in range(1, n)]
+        # Flip the sign for each other column position
+        sign = (-1) ** col
+        # NOTE Recursive call: reduces the matrix size by 1 dimension
+        # Results accumulate into det, using the right sign
+        det += sign * matrix[0][col] * determinant(sub_matrix)
+
+    return det
