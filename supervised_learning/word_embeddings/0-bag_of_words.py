@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Bag of Words module for creating text embeddings"""
 import numpy as np
-import re
 
 
 def bag_of_words(sentences, vocab=None):
@@ -18,37 +17,46 @@ def bag_of_words(sentences, vocab=None):
                    where s is the number of sentences and f is the number of features
         features: list of the features used for embeddings
     """
-    # Process sentences to extract words
-    processed_sentences = []
-    all_words = set()
+    # Clean and tokenize sentences
+    cleaned_sentences = []
+    vocab_set = set()
     
     for sentence in sentences:
-        # Convert to lowercase and remove punctuation
-        words = re.findall(r'\b[a-zA-Z]+\b', sentence.lower())
-        processed_sentences.append(words)
-        all_words.update(words)
+        # Convert to lowercase
+        sentence = sentence.lower()
+        # Remove punctuation and split
+        words = []
+        curr_word = ""
+        for char in sentence:
+            if char.isalpha():
+                curr_word += char
+            elif curr_word:
+                words.append(curr_word)
+                curr_word = ""
+        if curr_word:  # Add the last word if it exists
+            words.append(curr_word)
+        
+        cleaned_sentences.append(words)
+        vocab_set.update(words)
     
-    # Create vocabulary
+    # Create features list
     if vocab is None:
-        features = sorted(list(all_words))
+        features = np.array(sorted(list(vocab_set)))
     else:
-        features = vocab
-    
-    # Create word to index mapping
-    word_to_idx = {word: idx for idx, word in enumerate(features)}
+        features = np.array(vocab)
     
     # Create embeddings matrix
     num_sentences = len(sentences)
     num_features = len(features)
     embeddings = np.zeros((num_sentences, num_features), dtype=int)
     
-    # Fill embeddings matrix
-    for i, words in enumerate(processed_sentences):
+    # Word to index mapping
+    word_to_idx = {word: idx for idx, word in enumerate(features)}
+    
+    # Populate embeddings
+    for i, words in enumerate(cleaned_sentences):
         for word in words:
             if word in word_to_idx:
                 embeddings[i, word_to_idx[word]] += 1
-    
-    # Convert features to numpy array to match expected output format
-    features = np.array(features)
     
     return embeddings, features
