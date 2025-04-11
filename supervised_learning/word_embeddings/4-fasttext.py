@@ -1,46 +1,52 @@
 #!/usr/bin/env python3
-"""Defines a function that trains a Gensim FastText model."""
+"""
+FastText model training
+"""
+
 import gensim
 
-def fasttext_model(sentences, vector_size=100, min_count=5, negative=5, window=5, cbow=True, epochs=5, seed=0, workers=1):
-    """
-    Creates and trains a Gensim FastText model.
 
-    Args:
-        sentences (list of list of str): The sentences to be trained on
-        vector_size (int): Dimensionality of the embedding layer
-        min_count (int): Minimum frequency for a word to be included in training
-        negative (int): Size of negative sampling
-        window (int): Maximum distance between the current and predicted word
-        cbow (bool): Training type; True uses CBOW, False uses Skip-gram
-        epochs (int): Number of training epochs
-        seed (int): Random seed for reproducibility
-        workers (int): Number of worker threads to use
+def fasttext_model(sentences, vector_size=100, min_count=5,
+                   window=5, negative=5, cbow=True,
+                   epochs=5, seed=0, workers=1):
+    """
+    Creates, builds, and trains a FastText model.
+
+    :Parameters:
+    - sentences: list of tokenized sentences to be trained on
+    - vector_size: dimensionality of the embedding layer
+    - min_count: minimum number of occurrences of a word for use in training
+    - window: maximum distance between the current and predicted word within
+    a sentence
+    - negative: size of negative sampling
+    - cbow: boolean to determine training type; True is for CBOW, False for
+    Skip-gram
+    - epochs: number of iterations (epochs) to train over
+    - seed: seed for the random number generator
+    - workers: number of worker threads to train the model
 
     Returns:
-        gensim.models.fasttext.FastText: The trained FastText model
+    - The trained FastText model
     """
-    sg = 0 if cbow else 1
+    if cbow:
+        sg = 0
+    else:
+        sg = 1
 
-    # Initialize the FastText model using only the gensim import
     model = gensim.models.FastText(
+        sentences=sentences,
         vector_size=vector_size,
-        window=window,
         min_count=min_count,
+        window=window,
         negative=negative,
         sg=sg,
+        epochs=epochs,
         seed=seed,
         workers=workers
     )
-
-    # Build the vocabulary
+    # Prepare the model's vocabulary and train it
     model.build_vocab(sentences)
-
-    # Train the FastText model
-    model.train(
-        sentences=sentences,
-        total_examples=len(sentences),
-        epochs=epochs
-    )
+    model.train(sentences, total_examples=model.corpus_count,
+                epochs=model.epochs)
 
     return model
