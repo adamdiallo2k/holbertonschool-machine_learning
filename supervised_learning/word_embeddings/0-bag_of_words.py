@@ -1,62 +1,46 @@
 #!/usr/bin/env python3
-"""Bag of Words module for creating text embeddings"""
 import numpy as np
-
+import re
+import string
 
 def bag_of_words(sentences, vocab=None):
-    """
-    Creates a bag of words embedding matrix
-    
-    Args:
-        sentences: list of sentences to analyze
-        vocab: list of the vocabulary words to use for the analysis
-               If None, all words within sentences should be used
-    
-    Returns:
-        embeddings: numpy.ndarray of shape (s, f) containing the embeddings
-                   where s is the number of sentences and f is the number of features
-        features: list of the features used for embeddings
-    """
-    # Clean and tokenize sentences
-    cleaned_sentences = []
-    vocab_set = set()
-    
-    for sentence in sentences:
-        # Convert to lowercase
-        sentence = sentence.lower()
-        # Remove punctuation and split
-        words = []
-        curr_word = ""
-        for char in sentence:
-            if char.isalpha():
-                curr_word += char
-            elif curr_word:
-                words.append(curr_word)
-                curr_word = ""
-        if curr_word:  # Add the last word if it exists
-            words.append(curr_word)
-        
-        cleaned_sentences.append(words)
-        vocab_set.update(words)
-    
-    # Create features list
-    if vocab is None:
-        features = np.array(sorted(list(vocab_set)))
+    # If a vocab is provided, standardize it (i.e. lowercase, remove possessives and punctuation)
+    if vocab is not None:
+        features = []
+        for word in vocab:
+            # Lowercase the word
+            word_clean = word.lower()
+            # Remove possessive 's if it exists
+            word_clean = re.sub(r"'s\b", "", word_clean)
+            # Remove any remaining punctuation
+            word_clean = word_clean.translate(str.maketrans("", "", string.punctuation))
+            features.append(word_clean)
     else:
-        features = np.array(vocab)
+        # No vocab provided, so build set of unique words from all sentences.
+        words_set = set()
+        for sentence in sentences:
+            # Lowercase and remove possessive 's and punctuation
+            s = sentence.lower()
+            s = re.sub(r"'s\b", "", s)
+            s = s.translate(str.maketrans("", "", string.punctuation))
+            words = s.split()
+            words_set.update(words)
+        features = sorted(list(words_set))
     
-    # Create embeddings matrix
-    num_sentences = len(sentences)
-    num_features = len(features)
-    embeddings = np.zeros((num_sentences, num_features), dtype=int)
+    # Create a mapping from word to index in the features list.
+    word2idx = {word: idx for idx, word in enumerate(features)}
     
-    # Word to index mapping
-    word_to_idx = {word: idx for idx, word in enumerate(features)}
+    # Build the embeddings matrix: one row per sentence and one column per feature.
+    E = np.zeros((len(sentences), len(features)), dtype=int)
     
-    # Populate embeddings
-    for i, words in enumerate(cleaned_sentences):
+    # Loop through each sentence and count occurrences of each word.
+    for i, sentence in enumerate(sentences):
+        s = sentence.lower()
+        s = re.sub(r"'s\b", "", s)
+        s = s.translate(str.maketrans("", "", string.punctuation))
+        words = s.split()
         for word in words:
-            if word in word_to_idx:
-                embeddings[i, word_to_idx[word]] += 1
-    
-    return embeddings, features
+            if word in word2idx:
+                E[i, word2idx[word]] += 1
+                
+    return E, features
