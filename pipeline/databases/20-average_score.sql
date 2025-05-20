@@ -1,38 +1,19 @@
--- stored procedure AddBonus that adds a new correction for a student
+-- Procedure that computes and store average score for a student
+DROP TRIGGER IF EXISTS ComputeAverageScoreForUser;
+
 DELIMITER $$
 
--- create procedure with params
-CREATE PROCEDURE AddBonus(
-    IN user_id INT,
-    IN project_name VARCHAR(255),
-    IN score INT)
+CREATE PROCEDURE ComputeAverageScoreForUser(
+    IN user_id INT)
 
-BEGIN
-    -- creation or update projects
-    IF NOT EXISTS (
-        SELECT name
-        FROM projects
-        WHERE name=project_name
-        ) THEN
-            INSERT INTO projects(name)
-            VALUES (project_name);
-    END IF;
+    BEGIN
+        UPDATE users
+        SET average_score = (
+                SELECT AVG(score)
+                FROM corrections
+                WHERE corrections.user_id = user_id)
+        WHERE id = user_id;
 
-    -- create corresponding corrections row
-    INSERT INTO corrections (
-        user_id,
-        project_id,
-        score)
-        VALUES (
-            user_id, (SELECT id FROM projects
-                     WHERE name=project_name),
-            score);
-
-END $$
-DELIMITER;
-
-
-
-END $$
+    END $$
 
 DELIMITER;
